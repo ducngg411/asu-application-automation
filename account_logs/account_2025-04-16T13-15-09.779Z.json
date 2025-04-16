@@ -1,0 +1,43 @@
+{
+  "firstName": "William",
+  "lastName": "Brown",
+  "suffix": "IV",
+  "birthMonth": 2,
+  "birthDay": 13,
+  "birthYear": 2001,
+  "password": "b:jQ-4ZdrVOy",
+  "isFemale": true,
+  "gender": "F",
+  "address": "789 Pine Blvd",
+  "city": "Mesa",
+  "state": "NY",
+  "zipCode": "10005",
+  "mobileAreaCode": "554",
+  "mobileNumber": "1475520",
+  "phoneAreaCode": "554",
+  "phoneNumber": "1475520",
+  "ssn": "435621237",
+  "parent1": {
+    "firstName": "William",
+    "lastName": "Brown",
+    "isLiving": "Y",
+    "relation": "Mother",
+    "schoolingLevel": "High School",
+    "attendedAsu": "N"
+  },
+  "parent2": {
+    "firstName": "Paul",
+    "lastName": "Wilson",
+    "isLiving": "Y",
+    "relation": "Father",
+    "schoolingLevel": "Other/Unknown",
+    "attendedAsu": "N"
+  },
+  "partner": {
+    "firstName": "Robert",
+    "lastName": "Miller",
+    "relationship": "Spouse"
+  },
+  "email": "x17bxl9hf@hotmail.com",
+  "timestamp": "2025-04-16T13:15:09.774Z"
+}

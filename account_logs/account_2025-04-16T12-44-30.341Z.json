@@ -1,0 +1,41 @@
+{
+  "firstName": "Paul",
+  "lastName": "Johnson",
+  "suffix": "IV",
+  "birthMonth": 7,
+  "birthDay": 1,
+  "birthYear": 2003,
+  "password": "ZWe6g48oQ1",
+  "isFemale": true,
+  "gender": "F",
+  "address": "101 Maple Dr",
+  "city": "Tempe",
+  "state": "FL",
+  "zipCode": "32003",
+  "mobileAreaCode": "309",
+  "mobileNumber": "3644805",
+  "ssn": "710577782",
+  "parent1": {
+    "firstName": "Michael",
+    "lastName": "Johnson",
+    "isLiving": "Y",
+    "relation": "Mother",
+    "schoolingLevel": "High School",
+    "attendedAsu": "N"
+  },
+  "parent2": {
+    "firstName": "Steven",
+    "lastName": "Jackson",
+    "isLiving": "Y",
+    "relation": "Father",
+    "schoolingLevel": "Other/Unknown",
+    "attendedAsu": "Y"
+  },
+  "partner": {
+    "firstName": "Thomas",
+    "lastName": "Wilson",
+    "relationship": "Spouse"
+  },
+  "email": "rabingsdk@hotmail.com",
+  "timestamp": "2025-04-16T12:44:30.322Z"
+}

@@ -1,0 +1,43 @@
+{
+  "firstName": "Robert",
+  "lastName": "Smith",
+  "suffix": "IV",
+  "birthMonth": 12,
+  "birthDay": 24,
+  "birthYear": 2002,
+  "password": ".mYcp9?.jWw.",
+  "isFemale": true,
+  "gender": "F",
+  "address": "303 Elm St",
+  "city": "Surprise",
+  "state": "AZ",
+  "zipCode": "85001",
+  "mobileAreaCode": "694",
+  "mobileNumber": "4951919",
+  "phoneAreaCode": "694",
+  "phoneNumber": "4951919",
+  "ssn": "535125764",
+  "parent1": {
+    "firstName": "John",
+    "lastName": "Thomas",
+    "isLiving": "Y",
+    "relation": "Mother",
+    "schoolingLevel": "High School",
+    "attendedAsu": "N"
+  },
+  "parent2": {
+    "firstName": "Joseph",
+    "lastName": "Wilson",
+    "isLiving": "Y",
+    "relation": "Father",
+    "schoolingLevel": "Other/Unknown",
+    "attendedAsu": "Y"
+  },
+  "partner": {
+    "firstName": "Steven",
+    "lastName": "Jackson",
+    "relationship": "Spouse"
+  },
+  "email": "x17bxl9hf@hotmail.com",
+  "timestamp": "2025-04-16T13:15:39.850Z"
+}

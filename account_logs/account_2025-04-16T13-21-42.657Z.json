@@ -1,0 +1,43 @@
+{
+  "firstName": "Daniel",
+  "lastName": "White",
+  "suffix": "IV",
+  "birthMonth": 8,
+  "birthDay": 4,
+  "birthYear": 2003,
+  "password": "fDo8_8b?B:9s",
+  "isFemale": false,
+  "gender": "M",
+  "address": "707 Ash Cir",
+  "city": "Glendale",
+  "state": "FL",
+  "zipCode": "32004",
+  "mobileAreaCode": "807",
+  "mobileNumber": "7179183",
+  "phoneAreaCode": "807",
+  "phoneNumber": "7179183",
+  "ssn": "669191720",
+  "parent1": {
+    "firstName": "Robert",
+    "lastName": "Miller",
+    "isLiving": "Y",
+    "relation": "Mother",
+    "schoolingLevel": "High School",
+    "attendedAsu": "N"
+  },
+  "parent2": {
+    "firstName": "James",
+    "lastName": "Davis",
+    "isLiving": "Y",
+    "relation": "Father",
+    "schoolingLevel": "Other/Unknown",
+    "attendedAsu": "N"
+  },
+  "partner": {
+    "firstName": "Michael",
+    "lastName": "Smith",
+    "relationship": "Spouse"
+  },
+  "email": "vachelfakher@hotmail.com",
+  "timestamp": "2025-04-16T13:21:42.657Z"
+}

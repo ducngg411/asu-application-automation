@@ -1,0 +1,15 @@
+.node_modules
+.DS_Store
+.env
+package-lock.json
+yarn-error.log
+yarn.lock
+coverage
+dist
+.vscode
+.idea
+*.iml
+*.log
+*.tsbuildinfo
+*.tgz
+*.zip

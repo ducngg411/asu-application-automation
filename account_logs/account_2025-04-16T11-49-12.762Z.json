@@ -1,0 +1,41 @@
+{
+  "firstName": "Paul",
+  "lastName": "Taylor",
+  "suffix": "IV",
+  "birthMonth": 11,
+  "birthDay": 25,
+  "birthYear": 2001,
+  "password": ".1FX!-+U*_",
+  "isFemale": true,
+  "gender": "F",
+  "address": "606 Willow Ct",
+  "city": "Peoria",
+  "state": "TX",
+  "zipCode": "75001",
+  "mobileAreaCode": "861",
+  "mobileNumber": "5068954",
+  "ssn": "069759069",
+  "parent1": {
+    "firstName": "Michael",
+    "lastName": "Miller",
+    "isLiving": "Y",
+    "relation": "Mother",
+    "schoolingLevel": "High School",
+    "attendedAsu": "Y"
+  },
+  "parent2": {
+    "firstName": "Thomas",
+    "lastName": "Anderson",
+    "isLiving": "Y",
+    "relation": "Father",
+    "schoolingLevel": "Other/Unknown",
+    "attendedAsu": "Y"
+  },
+  "partner": {
+    "firstName": "Daniel",
+    "lastName": "White",
+    "relationship": "Spouse"
+  },
+  "email": "qhdx0l7plsq@hotmail.com",
+  "timestamp": "2025-04-16T11:49:12.697Z"
+}

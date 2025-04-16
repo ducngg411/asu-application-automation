@@ -1,0 +1,41 @@
+{
+  "firstName": "Anthony",
+  "lastName": "Jones",
+  "suffix": "IV",
+  "birthMonth": 10,
+  "birthDay": 27,
+  "birthYear": 2003,
+  "password": "qv/lXA!sM2%X",
+  "isFemale": false,
+  "gender": "M",
+  "address": "606 Willow Ct",
+  "city": "Surprise",
+  "state": "CA",
+  "zipCode": "90004",
+  "mobileAreaCode": "374",
+  "mobileNumber": "9433965",
+  "ssn": "675195184",
+  "parent1": {
+    "firstName": "David",
+    "lastName": "Brown",
+    "isLiving": "Y",
+    "relation": "Mother",
+    "schoolingLevel": "High School",
+    "attendedAsu": "Y"
+  },
+  "parent2": {
+    "firstName": "John",
+    "lastName": "White",
+    "isLiving": "Y",
+    "relation": "Father",
+    "schoolingLevel": "Other/Unknown",
+    "attendedAsu": "Y"
+  },
+  "partner": {
+    "firstName": "Paul",
+    "lastName": "Harris",
+    "relationship": "Spouse"
+  },
+  "email": "rabingsdk@hotmail.com",
+  "timestamp": "2025-04-16T12:56:35.963Z"
+}

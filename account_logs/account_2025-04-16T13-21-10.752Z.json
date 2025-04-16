@@ -1,0 +1,43 @@
+{
+  "firstName": "Robert",
+  "lastName": "Johnson",
+  "suffix": "IV",
+  "birthMonth": 6,
+  "birthDay": 21,
+  "birthYear": 2002,
+  "password": "L6r+c:JJ1B6q",
+  "isFemale": false,
+  "gender": "M",
+  "address": "505 Spruce Way",
+  "city": "Surprise",
+  "state": "TX",
+  "zipCode": "75002",
+  "mobileAreaCode": "807",
+  "mobileNumber": "3611402",
+  "phoneAreaCode": "807",
+  "phoneNumber": "3611402",
+  "ssn": "663749431",
+  "parent1": {
+    "firstName": "Daniel",
+    "lastName": "Miller",
+    "isLiving": "Y",
+    "relation": "Mother",
+    "schoolingLevel": "High School",
+    "attendedAsu": "N"
+  },
+  "parent2": {
+    "firstName": "Anthony",
+    "lastName": "Harris",
+    "isLiving": "Y",
+    "relation": "Father",
+    "schoolingLevel": "Other/Unknown",
+    "attendedAsu": "Y"
+  },
+  "partner": {
+    "firstName": "Mark",
+    "lastName": "Miller",
+    "relationship": "Spouse"
+  },
+  "email": "vachelfakher@hotmail.com",
+  "timestamp": "2025-04-16T13:21:10.751Z"
+}
