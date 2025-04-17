@@ -274,27 +274,27 @@ function generateRandomData() {
   }
   
   // Hàm tạo SSN ngẫu nhiên nhưng hợp lệ theo format
-  function generateRandomSSN() {
-    // Tạo 3 số đầu tiên (không được là 000, 666, hoặc 900-999)
-    let area;
-    do {
-      area = Math.floor(Math.random() * 899 + 1).toString().padStart(3, '0');
-    } while (area === '000' || area === '666' || (parseInt(area) >= 900 && parseInt(area) <= 999));
-  
-    // Tạo 2 số giữa (00-99, không được là 00)
-    let group;
-    do {
-      group = Math.floor(Math.random() * 99 + 1).toString().padStart(2, '0');
-    } while (group === '00');
-  
-    // Tạo 4 số cuối (0000-9999, không được là 0000)
-    let serial;
-    do {
-      serial = Math.floor(Math.random() * 9999 + 1).toString().padStart(4, '0');
-    } while (serial === '0000');
-  
-    return area + group + serial;
-  }
+function generateRandomSSN() {
+  // Tạo 3 số đầu tiên (không được là 000, 666, hoặc 900-999)
+  let area;
+  do {
+    area = Math.floor(Math.random() * 899 + 1).toString().padStart(3, '0');
+  } while (area === '000' || area === '666' || (parseInt(area) >= 900 && parseInt(area) <= 999));
+
+  // Tạo 2 số giữa (00-99, không được là 00)
+  let group;
+  do {
+    group = Math.floor(Math.random() * 99 + 1).toString().padStart(2, '0');
+  } while (group === '00');
+
+  // Tạo 4 số cuối (0000-9999, không được là 0000)
+  let serial;
+  do {
+    serial = Math.floor(Math.random() * 9999 + 1).toString().padStart(4, '0');
+  } while (serial === '0000');
+
+  return area + group + serial;
+}
   
   // Hàm tạo mật khẩu theo yêu cầu của ASU:
   // - Ít nhất 10 ký tự
@@ -303,56 +303,743 @@ function generateRandomData() {
   //   - Chữ thường (a-z)
   //   - Số (0-9)
   //   - Ký tự đặc biệt (!%*_-+=:./?)
-  function generateASUPassword() {
-    const upperChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const lowerChars = 'abcdefghijklmnopqrstuvwxyz';
-    const numbers = '0123456789';
-    const specialChars = '!%*_-+=:./?';
-    
-    // Luôn sử dụng tất cả 4 loại ký tự để đảm bảo tuân thủ
-    let password = '';
-    
-    // Thêm ít nhất một ký tự từ mỗi loại
-    password += upperChars.charAt(Math.floor(Math.random() * upperChars.length));
-    password += lowerChars.charAt(Math.floor(Math.random() * lowerChars.length));
-    password += numbers.charAt(Math.floor(Math.random() * numbers.length));
-    password += specialChars.charAt(Math.floor(Math.random() * specialChars.length));
-    
-    // Thêm nhiều ký tự ngẫu nhiên để đạt được ít nhất 10 ký tự
-    const allChars = upperChars + lowerChars + numbers + specialChars;
-    while (password.length < 12) { // Sử dụng 12 để đảm bảo an toàn (nhiều hơn 10 yêu cầu)
-      password += allChars.charAt(Math.floor(Math.random() * allChars.length));
-    }
-    
-    // Trộn ngẫu nhiên các ký tự
-    return password.split('').sort(() => 0.5 - Math.random()).join('');
+function generateASUPassword() {
+  const upperChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const lowerChars = 'abcdefghijklmnopqrstuvwxyz';
+  const numbers = '0123456789';
+  const specialChars = '!%*_-+=:./?';
+  
+  // Luôn sử dụng tất cả 4 loại ký tự để đảm bảo tuân thủ
+  let password = '';
+  
+  // Thêm ít nhất một ký tự từ mỗi loại
+  password += upperChars.charAt(Math.floor(Math.random() * upperChars.length));
+  password += lowerChars.charAt(Math.floor(Math.random() * lowerChars.length));
+  password += numbers.charAt(Math.floor(Math.random() * numbers.length));
+  password += specialChars.charAt(Math.floor(Math.random() * specialChars.length));
+  
+  // Thêm nhiều ký tự ngẫu nhiên để đạt được ít nhất 10 ký tự
+  const allChars = upperChars + lowerChars + numbers + specialChars;
+  while (password.length < 12) { // Sử dụng 12 để đảm bảo an toàn (nhiều hơn 10 yêu cầu)
+    password += allChars.charAt(Math.floor(Math.random() * allChars.length));
   }
   
-  // Hàm kiểm tra mật khẩu đáp ứng các yêu cầu của ASU
-  function verifyPasswordRequirements(password) {
-    // Kiểm tra độ dài tối thiểu
-    if (password.length < 10) {
-      return false;
+  // Trộn ngẫu nhiên các ký tự
+  return password.split('').sort(() => 0.5 - Math.random()).join('');
+}
+
+// Hàm tạo địa chỉ thực tại Hoa Kỳ với zip code phù hợp
+function generateRealUSAddress() {
+  // Các địa chỉ thực tế
+  const realAddresses = [
+    {
+      address: '123 Main St',
+      city: 'Dallas',
+      state: 'TX',
+      zipCode: '75201'
+    },
+    {
+      address: '456 Oak Ave',
+      city: 'Houston',
+      state: 'TX',
+      zipCode: '77002'
+    },
+    {
+      address: '789 Pine Blvd',
+      city: 'Austin',
+      state: 'TX',
+      zipCode: '78701'
+    },
+    {
+      address: '101 Maple Dr',
+      city: 'San Antonio',
+      state: 'TX',
+      zipCode: '78205'
+    },
+    {
+      address: '222 Elm St',
+      city: 'Fort Worth',
+      state: 'TX',
+      zipCode: '76102'
+    },
+    {
+      address: '333 Birch Rd',
+      city: 'Phoenix',
+      state: 'AZ',
+      zipCode: '85001'
+    },
+    {
+      address: '444 Spruce Way',
+      city: 'Tucson',
+      state: 'AZ',
+      zipCode: '85701'
+    },
+    {
+      address: '555 Cedar Ln',
+      city: 'Mesa',
+      state: 'AZ',
+      zipCode: '85201'
+    },
+    {
+      address: '666 Willow Ct',
+      city: 'Chandler',
+      state: 'AZ',
+      zipCode: '85225'
+    },
+    {
+      address: '777 Ash Cir',
+      city: 'Scottsdale',
+      state: 'AZ',
+      zipCode: '85251'
+    }
+  ];
+  
+  // Chọn một địa chỉ ngẫu nhiên
+  const randomIndex = Math.floor(Math.random() * realAddresses.length);
+  return realAddresses[randomIndex];
+}
+
+// Hàm xử lý trang thông tin giáo dục (trang 3)
+async function handleEducationPage(driver, userData) {
+  console.log('\n===== TRANG 3: THÔNG TIN TRƯỜNG HỌC =====');
+  
+  try {
+    // Đợi cho trang load hoàn chỉnh
+    await driver.sleep(2000);
+    
+    // 1. Chọn Country (United States)
+    console.log('Chọn Country: United States');
+    const countrySelect = await driver.findElement(By.id('form-app-school-country'));
+    await scrollToElement(driver, countrySelect);
+    await driver.executeScript(`
+      const select = arguments[0];
+      select.value = 'USA';
+      const event = new Event('change', { bubbles: true });
+      select.dispatchEvent(event);
+    `, countrySelect);
+    await humanDelay();
+    
+    // 2. Chọn State trùng với state đã điền ở trang 2
+    console.log(`Chọn State: ${userData.state}`);
+    const stateSelect = await driver.findElement(By.id('form-app-school-state'));
+    await scrollToElement(driver, stateSelect);
+    await driver.executeScript(`
+      const select = arguments[0];
+      select.value = '${userData.state}';
+      const event = new Event('change', { bubbles: true });
+      select.dispatchEvent(event);
+    `, stateSelect);
+    await humanDelay();
+    
+    // Đợi để city load
+    await driver.sleep(2000);
+    
+    // 3. Chọn City
+    console.log(`Chọn City: ${userData.city}`);
+    const citySelect = await driver.findElement(By.id('form-app-school-city'));
+    await scrollToElement(driver, citySelect);
+    
+    // Kiểm tra xem city có trong danh sách không
+    let cityExists = false;
+    try {
+      cityExists = await driver.executeScript(`
+        const select = arguments[0];
+        for (let i = 0; i < select.options.length; i++) {
+          if (select.options[i].value === '${userData.city}') {
+            return true;
+          }
+        }
+        return false;
+      `, citySelect);
+    } catch (e) {
+      console.log('Lỗi khi kiểm tra city:', e.message);
     }
     
-    // Kiểm tra số loại ký tự
-    let typesCount = 0;
+    // Nếu city không có trong danh sách, chọn "Any City"
+    let cityToSelect = userData.city;
+    if (!cityExists) {
+      cityToSelect = 'Any City';
+      console.log(`City ${userData.city} không có trong danh sách, chọn "Any City" thay thế`);
+    }
     
-    // Kiểm tra chữ hoa
-    if (/[A-Z]/.test(password)) typesCount++;
+    await driver.executeScript(`
+      const select = arguments[0];
+      select.value = '${cityToSelect}';
+      const event = new Event('change', { bubbles: true });
+      select.dispatchEvent(event);
+    `, citySelect);
+    await humanDelay();
     
-    // Kiểm tra chữ thường
-    if (/[a-z]/.test(password)) typesCount++;
+    // Đợi để school load
+    await driver.sleep(1500);
     
-    // Kiểm tra chữ số
-    if (/[0-9]/.test(password)) typesCount++;
+    // 4. Chọn "Home School" cho trường học
+    console.log('Chọn "Home School" cho High School');
+    try {
+      const schoolSelect = await driver.findElement(By.id('form-app-high-school'));
+      await scrollToElement(driver, schoolSelect);
+      
+      let homeSchoolExists = await driver.executeScript(`
+        const select = arguments[0];
+        for (let i = 0; i < select.options.length; i++) {
+          if (select.options[i].text.toLowerCase().includes('home school')) {
+            select.selectedIndex = i;
+            const event = new Event('change', { bubbles: true });
+            select.dispatchEvent(event);
+            return true;
+          }
+        }
+        return false;
+      `, schoolSelect);
+      
+      if (!homeSchoolExists) {
+        // Nếu không tìm thấy Home School, chọn option đầu tiên
+        console.log('Không tìm thấy "Home School", chọn trường đầu tiên trong danh sách');
+        await driver.executeScript(`
+          const select = arguments[0];
+          if (select.options.length > 1) {
+            select.selectedIndex = 1;
+            const event = new Event('change', { bubbles: true });
+            select.dispatchEvent(event);
+          }
+        `, schoolSelect);
+      }
+    } catch (error) {
+      console.log('Lỗi khi chọn Home School:', error.message);
+    }
+    await humanDelay();
     
-    // Kiểm tra ký tự đặc biệt
-    if (/[!%*_\-+=:./?]/.test(password)) typesCount++;
+    // 5. Chọn Graduation Date
+    // Chọn một tháng ngẫu nhiên
+    const randomMonth = Math.floor(Math.random() * 12) + 1;
+    console.log(`Chọn graduation month: ${randomMonth}`);
+    const monthSelect = await driver.findElement(By.id('form-app-school-graduation-date-m'));
+    await scrollToElement(driver, monthSelect);
+    await driver.executeScript(`
+      const select = arguments[0];
+      select.value = '${randomMonth}';
+      const event = new Event('change', { bubbles: true });
+      select.dispatchEvent(event);
+    `, monthSelect);
+    await humanDelay();
     
-    // Cần ít nhất 3 trong 4 loại
-    return typesCount >= 3;
+    // Chọn năm tốt nghiệp (2022-2024)
+    const graduationYear = Math.floor(Math.random() * 3) + 2022;
+    console.log(`Điền graduation year: ${graduationYear}`);
+    const yearInput = await driver.findElement(By.id('form-app-school-graduation-date-y'));
+    await scrollToElement(driver, yearInput);
+    await yearInput.clear();
+    await typeHumanLike(yearInput, graduationYear.toString());
+    await humanDelay();
+    
+    // 6. Tích checkbox cho transcript name
+    console.log('Tích checkbox cho transcript name');
+    try {
+      const transcriptCheckbox = await driver.findElement(By.id('transcriptName-1'));
+      await scrollToElement(driver, transcriptCheckbox);
+      await safeClick(driver, transcriptCheckbox);
+      await humanDelay();
+    } catch (error) {
+      console.log('Không tìm thấy checkbox transcriptName-1:', error.message);
+    }
+    
+    // 7. Click Done
+    console.log('Click Done');
+    try {
+      const doneButton = await driver.findElement(By.css('.hs-done'));
+      await scrollToElement(driver, doneButton);
+      await safeClick(driver, doneButton);
+      await humanDelay();
+    } catch (error) {
+      console.log('Không tìm thấy nút Done:', error.message);
+    }
+    
+    // 8. Chọn "I have never attended a college or university"
+    console.log('Chọn "I have never attended a college or university"');
+    const collegeSelect = await driver.findElement(By.id('app-past-colleges-1'));
+    await scrollToElement(driver, collegeSelect);
+    await driver.executeScript(`
+      const select = arguments[0];
+      select.value = 'never attended';
+      const event = new Event('change', { bubbles: true });
+      select.dispatchEvent(event);
+    `, collegeSelect);
+    await humanDelay();
+    
+    // 9. Click Save & Continue
+    console.log('Click Save & Continue');
+    const saveButton = await driver.findElement(By.id('btn-accept-start-app-button'));
+    await scrollToElement(driver, saveButton);
+    await safeClick(driver, saveButton);
+    
+    // Ghi log thành công
+    console.log('Đã hoàn thành điền form trang 3 (Thông tin trường học)!');
+    
+    // Đợi chuyển trang
+    await driver.sleep(3000);
+    
+    return true;
+  } catch (error) {
+    console.error('LỖI khi điền form trang 3 (Thông tin trường học):', error);
+    throw error;
   }
+}
+
+// Hàm xử lý trang Self-reported (trang 4)
+async function handleSelfReportedPage(driver) {
+  console.log('\n===== TRANG 4: FASTER ADMISSION =====');
+  
+  try {
+    // Đợi cho trang load hoàn chỉnh
+    await driver.sleep(2000);
+    
+    // Chọn "No" cho câu hỏi "Want a faster admission"
+    console.log('Chọn "No" cho câu hỏi "Want a faster admission"');
+    try {
+      const noRadio = await driver.findElement(By.id('self-reported-question-no'));
+      await scrollToElement(driver, noRadio);
+      await safeClick(driver, noRadio);
+      await humanDelay();
+    } catch (error) {
+      console.log('Không tìm thấy radio button No cho faster admission:', error.message);
+      // Nếu không tìm thấy radio button, có thể trang đã tự chuyển hoặc không có trang này
+      console.log('Bỏ qua trang Faster Admission');
+      return true;
+    }
+    
+    // Có thể trang sẽ tự chuyển tiếp sau khi chọn No, nếu không thì ta cần tìm nút Continue
+    try {
+      // Tìm nút Continue nếu có
+      const continueButton = await driver.findElement(By.css('input[type="submit"][value="Continue"]'));
+      await scrollToElement(driver, continueButton);
+      await safeClick(driver, continueButton);
+    } catch (e) {
+      console.log('Không tìm thấy nút Continue, trang có thể đã tự chuyển tiếp');
+    }
+    
+    // Ghi log thành công
+    console.log('Đã hoàn thành điền form trang 4 (Faster Admission)!');
+    
+    // Đợi chuyển trang
+    await driver.sleep(3000);
+    
+    return true;
+  } catch (error) {
+    console.error('LỖI khi điền form trang 4 (Faster Admission):', error);
+    throw error;
+  }
+}
+
+// Hàm xử lý trang Residency (trang 5)
+async function handleResidencyPage(driver, userData) {
+  console.log('\n===== TRANG 5: RESIDENCY INFORMATION =====');
+  
+  try {
+    // Đợi cho trang load hoàn chỉnh
+    await driver.sleep(2000);
+    
+    // Kiểm tra xem trang này có tồn tại không
+    let residencyStateExists = false;
+    try {
+      const stateSelect = await driver.findElement(By.id('residency-domicile-state'));
+      residencyStateExists = true;
+    } catch (e) {
+      console.log('Không tìm thấy trang Residency, có thể đã bỏ qua');
+      return true;
+    }
+    
+    if (!residencyStateExists) {
+      return true;
+    }
+    
+    // 1. Chọn State cho "State do you consider"
+    console.log(`Chọn State: ${userData.state} cho "State do you consider"`);
+    const stateSelect = await driver.findElement(By.id('residency-domicile-state'));
+    await scrollToElement(driver, stateSelect);
+    await driver.executeScript(`
+      const select = arguments[0];
+      select.value = '${userData.state}';
+      const event = new Event('change', { bubbles: true });
+      select.dispatchEvent(event);
+    `, stateSelect);
+    await humanDelay();
+    
+    // 2. Chọn State cho "State do your parents"
+    console.log(`Chọn State: ${userData.state} cho "State do your parents"`);
+    try {
+      const parentStateSelect = await driver.findElement(By.id('parent-domicile-state'));
+      await scrollToElement(driver, parentStateSelect);
+      await driver.executeScript(`
+        const select = arguments[0];
+        select.value = '${userData.state}';
+        const event = new Event('change', { bubbles: true });
+        select.dispatchEvent(event);
+      `, parentStateSelect);
+      await humanDelay();
+    } catch (error) {
+      console.log('Không tìm thấy dropdown parent-domicile-state:', error.message);
+    }
+    
+    // 3. Click Save & Continue
+    console.log('Click Save & Continue');
+    const saveButton = await driver.findElement(By.id('save-continue-btn'));
+    await scrollToElement(driver, saveButton);
+    await safeClick(driver, saveButton);
+    
+    // Ghi log thành công
+    console.log('Đã hoàn thành điền form trang 5 (Residency Information)!');
+    
+    // Đợi chuyển trang
+    await driver.sleep(3000);
+    
+    return true;
+  } catch (error) {
+    console.error('LỖI khi điền form trang 5 (Residency Information):', error);
+    throw error;
+  }
+}
+
+// Hàm xử lý trang chọn ngành học (trang 6)
+async function handleMajorSelectionPage(driver) {
+  console.log('\n===== TRANG 6: MAJOR SELECTION =====');
+  
+  try {
+    // Đợi cho trang load hoàn chỉnh
+    await driver.sleep(3000);
+    
+    // Kiểm tra xem trang này có tồn tại không
+    let majorSelectionExists = false;
+    try {
+      const searchButton = await driver.findElement(By.css('.search-button'));
+      majorSelectionExists = true;
+    } catch (e) {
+      console.log('Không tìm thấy trang Major Selection, có thể đã bỏ qua');
+      return true;
+    }
+    
+    if (!majorSelectionExists) {
+      return true;
+    }
+    
+    console.log('Click Search button cho Course by Location');
+try {
+  // Tìm nút Search chính xác bằng thuộc tính onclick
+  const searchButton = await driver.findElement(By.css("input[value='Search'][onclick='doLocationSearch();']"));
+  
+  if (searchButton) {
+    await scrollToElement(driver, searchButton);
+    await safeClick(driver, searchButton);
+    await humanDelay();
+    console.log('Đã click nút Search cho Location Search');
+  }
+} catch (error) {
+  console.log('Không tìm thấy nút Search chính xác qua CSS, thử XPath...');
+  
+  try {
+    // Thử tìm bằng XPath
+    const searchButtonXPath = await driver.findElement(By.xpath("//input[@value='Search' and @onclick='doLocationSearch();']"));
+    await scrollToElement(driver, searchButtonXPath);
+    await safeClick(driver, searchButtonXPath);
+    await humanDelay();
+    console.log('Đã click nút Search qua XPath');
+  } catch (e) {
+    console.log('Không tìm thấy nút Search qua XPath, thử click trực tiếp qua JS...');
+    
+    // Dùng JavaScript để click
+    const jsClicked = await driver.executeScript(`
+      const buttons = document.querySelectorAll("input[value='Search']");
+      for (let btn of buttons) {
+        if (btn.getAttribute('onclick') === 'doLocationSearch();') {
+          btn.click();
+          return true;
+        }
+      }
+      return false;
+    `);
+    
+    if (jsClicked) {
+      console.log('Đã click nút Search qua JavaScript');
+      await humanDelay();
+    } else {
+      console.log('Không thể click nút Search, bỏ qua bước này');
+    }
+  }
+}
+    
+    // 2. Click Choose button để chọn ngành
+    console.log('Click Choose button để chọn ngành');
+    try {
+      const chooseButton = await driver.findElement(By.css('.choose.localStore'));
+      await scrollToElement(driver, chooseButton);
+      await safeClick(driver, chooseButton);
+      await humanDelay();
+    } catch (error) {
+      console.log('Không tìm thấy nút Choose, thử cách khác');
+      
+      // Thử tìm nút Choose bằng XPath
+      try {
+        const chooseButton = await driver.findElement(By.xpath("//input[@value='Choose']"));
+        await scrollToElement(driver, chooseButton);
+        await safeClick(driver, chooseButton);
+        await humanDelay();
+      } catch (e) {
+        console.log('Không tìm thấy nút Choose bằng XPath, bỏ qua bước này');
+      }
+    }
+    
+    // 3. Đợi modal hiện ra và chọn một option ngẫu nhiên
+    // 3. Đợi modal hiện ra và chọn một option ngẫu nhiên
+  try {
+    await driver.wait(until.elementLocated(By.css('input[name="terms-for-major-all"]')), 8000);
+    console.log('Modal đã hiện ra, chọn một option ngẫu nhiên');
+    
+    // Tìm chính xác các radio button mong muốn
+    const targetRadios = await driver.findElements(By.css('input[name="terms-for-major-all"][value="2254-SESA"], input[name="terms-for-major-all"][value="2254-SESB"]'));
+    
+    if (targetRadios.length > 0) {
+      // Chọn một option ngẫu nhiên từ các radio button đã tìm được
+      const randomIndex = Math.floor(Math.random() * targetRadios.length);
+      const selectedOption = targetRadios[randomIndex];
+      
+      // Lấy giá trị của radio button đã chọn để ghi log
+      const radioValue = await selectedOption.getAttribute('value');
+      console.log(`Chọn radio button với giá trị: ${radioValue}`);
+      
+      await scrollToElement(driver, selectedOption);
+      await safeClick(driver, selectedOption);
+      await humanDelay();
+      
+      // 4. Click Add Major
+      console.log('Click Add Major');
+      const addMajorButton = await driver.findElement(By.css('input[value="Add Major"]'));
+      await scrollToElement(driver, addMajorButton);
+      await safeClick(driver, addMajorButton);
+      await humanDelay();
+    } else {
+      console.log('Không tìm thấy các radio button cụ thể, thử tìm bất kỳ radio button nào');
+      
+      // Nếu không tìm thấy radio button cụ thể, thì chọn bất kỳ radio button nào
+      const anyRadios = await driver.findElements(By.css('input[name="terms-for-major-all"]'));
+      if (anyRadios.length > 0) {
+        const randomIndex = Math.floor(Math.random() * anyRadios.length);
+        const selectedOption = anyRadios[randomIndex];
+        await scrollToElement(driver, selectedOption);
+        await safeClick(driver, selectedOption);
+        await humanDelay();
+        
+        // Click Add Major
+        console.log('Click Add Major');
+        const addMajorButton = await driver.findElement(By.css('input[value="Add Major"]'));
+        await scrollToElement(driver, addMajorButton);
+        await safeClick(driver, addMajorButton);
+        await humanDelay();
+      } else {
+        console.log('Không tìm thấy radio button options trong modal, bỏ qua bước này');
+      }
+    }
+  } catch (error) {
+    console.log('Không tìm thấy modal hoặc hết thời gian chờ:', error.message);
+  }
+    
+    // 5. Chọn một interest ngẫu nhiên
+    console.log('Chọn một interest ngẫu nhiên');
+    try {
+      const interestSelect = await driver.findElement(By.id('form-app-secondary-interests'));
+      await scrollToElement(driver, interestSelect);
+      
+      // Lấy tất cả các options trừ option đầu tiên (Choose...)
+      const interestOptions = await driver.executeScript(`
+        const select = arguments[0];
+        // Lấy tất cả các options trừ option đầu tiên (Choose...)
+        const options = [];
+        for (let i = 1; i < select.options.length; i++) {
+          options.push(select.options[i].value);
+        }
+        return options;
+      `, interestSelect);
+      
+      if (interestOptions.length > 0) {
+        // Chọn một option ngẫu nhiên
+        const randomInterestIndex = Math.floor(Math.random() * interestOptions.length);
+        const selectedInterest = interestOptions[randomInterestIndex];
+        
+        await driver.executeScript(`
+          const select = arguments[0];
+          select.value = '${selectedInterest}';
+          const event = new Event('change', { bubbles: true });
+          select.dispatchEvent(event);
+        `, interestSelect);
+        await humanDelay();
+      }
+    } catch (error) {
+      console.log('Không tìm thấy dropdown interest:', error.message);
+    }
+    
+    // 6. Tick checkbox "Future opportunities"
+    try {
+      console.log('Tick checkbox "Future opportunities"');
+      const futureCheckbox = await driver.findElement(By.id('teacher-cert-interest'));
+      await scrollToElement(driver, futureCheckbox);
+      await safeClick(driver, futureCheckbox);
+      await humanDelay();
+    } catch (e) {
+      console.log('Không tìm thấy checkbox Future opportunities, bỏ qua');
+    }
+    
+    // 7. Click Save & Continue
+    console.log('Click Save & Continue');
+    try {
+      const saveButton = await driver.findElement(By.id('selected-major-save-continue-btn'));
+      await scrollToElement(driver, saveButton);
+      await safeClick(driver, saveButton);
+    } catch (error) {
+      console.log('Không tìm thấy nút Save & Continue theo ID, thử cách khác');
+      
+      // Thử tìm nút Save & Continue bằng XPath
+      try {
+        const saveButton = await driver.findElement(By.xpath("//input[@value='Save & Continue']"));
+        await scrollToElement(driver, saveButton);
+        await safeClick(driver, saveButton);
+      } catch (e) {
+        console.log('Không tìm thấy nút Save & Continue bằng XPath, bỏ qua');
+      }
+    }
+    
+    // Ghi log thành công
+    console.log('Đã hoàn thành điền form trang 6 (Major Selection)!');
+    
+    // Đợi chuyển trang
+    await driver.sleep(3000);
+    
+    return true;
+  } catch (error) {
+    console.error('LỖI khi điền form trang 6 (Major Selection):', error);
+    throw error;
+  }
+}
+
+// Hàm xử lý trang cuối cùng và submit application
+async function handleFinalSubmitPage(driver) {
+  console.log('\n===== TRANG 7: FINAL REVIEW & SUBMIT =====');
+  
+  try {
+    // Đợi cho trang load hoàn chỉnh
+    await driver.sleep(3000);
+    
+    // Kiểm tra xem trang này có tồn tại không
+    let finalPageExists = false;
+    try {
+      const confirmCheckbox = await driver.findElement(By.id('review-checkbox'));
+      finalPageExists = true;
+    } catch (e) {
+      console.log('Không tìm thấy trang Final Review, có thể quá trình đã hoàn tất');
+      return true;
+    }
+    
+    if (!finalPageExists) {
+      return true;
+    }
+    
+    // 1. Tick checkbox xác nhận
+    console.log('Tick checkbox xác nhận');
+    const confirmCheckbox = await driver.findElement(By.id('review-checkbox'));
+    await scrollToElement(driver, confirmCheckbox);
+    await safeClick(driver, confirmCheckbox);
+    await humanDelay();
+    
+    // 2. Click Submit My Application
+    console.log('Click Submit My Application');
+    const submitButton = await driver.findElement(By.id('review-submit'));
+    await scrollToElement(driver, submitButton);
+    await safeClick(driver, submitButton);
+    
+    // 3. Đợi trang xác nhận thành công load
+    console.log('Đợi trang xác nhận thành công load...');
+    try {
+      // Đợi tối đa 30 giây cho trang xác nhận thành công
+      await driver.wait(until.elementLocated(By.xpath("//h1[contains(text(), 'Application Submitted')]")), 30000);
+      
+      console.log('THÀNH CÔNG! Đơn đăng ký đã được nộp thành công!');
+      
+      // Chụp ảnh màn hình thành công
+      try {
+        const timestamp = new Date().toISOString().replace(/:/g, '-');
+        const screenshotPath = path.join(CONFIG.LOG_DIR, `success_final_${timestamp}.png`);
+        
+        const screenshot = await driver.takeScreenshot();
+        fs.writeFileSync(screenshotPath, screenshot, 'base64');
+        
+        console.log(`Đã lưu ảnh kết quả cuối cùng tại: ${screenshotPath}`);
+      } catch (e) {
+        console.error('Không thể chụp ảnh kết quả cuối cùng:', e.message);
+      }
+      
+      return true;
+    } catch (timeoutError) {
+      console.log('Không thấy trang xác nhận thành công trong thời gian chờ!');
+      
+      // Kiểm tra xem có lỗi không
+      const pageSource = await driver.getPageSource();
+      if (pageSource.includes('error') || pageSource.includes('Error') || pageSource.includes('fail') || pageSource.includes('Fail')) {
+        console.error('Có thể đã xảy ra lỗi khi nộp đơn!');
+        
+        // Chụp ảnh màn hình lỗi
+        const timestamp = new Date().toISOString().replace(/:/g, '-');
+        const screenshotPath = path.join(CONFIG.LOG_DIR, `error_final_${timestamp}.png`);
+        
+        const screenshot = await driver.takeScreenshot();
+        fs.writeFileSync(screenshotPath, screenshot, 'base64');
+        
+        console.log(`Đã lưu ảnh lỗi cuối cùng tại: ${screenshotPath}`);
+        
+        throw new Error('Có lỗi xảy ra khi nộp đơn!');
+      }
+      
+      // Nếu không phát hiện lỗi, có thể trang đang tải chậm
+      console.log('Không phát hiện lỗi, có thể trang đang tải chậm. Đợi thêm...');
+      await driver.sleep(10000);
+      
+      // Kiểm tra lại
+      const updatedPageSource = await driver.getPageSource();
+      if (updatedPageSource.includes('Application Submitted') || updatedPageSource.includes('Success') || updatedPageSource.includes('success')) {
+        console.log('THÀNH CÔNG! Đơn đăng ký đã được nộp thành công!');
+        return true;
+      } else {
+        console.error('Không thể xác nhận đơn đã được nộp thành công!');
+        throw new Error('Không thể xác nhận đơn đã được nộp thành công!');
+      }
+    }
+  } catch (error) {
+    console.error('LỖI khi nộp đơn cuối cùng:', error);
+    throw error;
+  }
+}
+  
+  // Hàm kiểm tra mật khẩu đáp ứng các yêu cầu của ASU
+function verifyPasswordRequirements(password) {
+  // Kiểm tra độ dài tối thiểu
+  if (password.length < 10) {
+    return false;
+  }
+  
+  // Kiểm tra số loại ký tự
+  let typesCount = 0;
+  
+  // Kiểm tra chữ hoa
+  if (/[A-Z]/.test(password)) typesCount++;
+  
+  // Kiểm tra chữ thường
+  if (/[a-z]/.test(password)) typesCount++;
+  
+  // Kiểm tra chữ số
+  if (/[0-9]/.test(password)) typesCount++;
+  
+  // Kiểm tra ký tự đặc biệt
+  if (/[!%*_\-+=:./?]/.test(password)) typesCount++;
+  
+  // Cần ít nhất 3 trong 4 loại
+  return typesCount >= 3;
+}
   
   // Hàm lưu thông tin tài khoản
   function saveAccountInfo(accountInfo) {
@@ -1048,6 +1735,52 @@ await humanDelay();
     const saveButton = await driver.findElement(By.id('btn-accept-start-app-button'));
     await scrollToElement(driver, saveButton);
     await safeClick(driver, saveButton);
+
+        // Kiểm tra và nhấn nút Submit (nếu xuất hiện)
+        try {
+          console.log('Kiểm tra và nhấn nút Submit...');
+          await driver.sleep(2000); // Đợi popup hiển thị
+          
+          // Dùng JavaScript trực tiếp để tìm và nhấn nút Submit có text là "Submit"
+          const submitClicked = await driver.executeScript(`
+            const buttons = document.querySelectorAll('button.ui-button');
+            for (let i = 0; i < buttons.length; i++) {
+              if (buttons[i].textContent.trim() === 'Submit') {
+                buttons[i].click();
+                return true;
+              }
+            }
+            return false;
+          `);
+          
+          if (submitClicked) {
+            console.log('Đã nhấn nút Submit thành công bằng JavaScript!');
+            await humanDelay();
+          } else {
+            console.log('Không tìm thấy nút Submit chính xác, thử cách khác...');
+            
+            // Thử cách 2: Nhấn tất cả các nút có class ui-button
+            const allButtonsClicked = await driver.executeScript(`
+              const buttons = document.querySelectorAll('button.ui-button');
+              let clicked = false;
+              for (let i = 0; i < buttons.length; i++) {
+                buttons[i].click();
+                clicked = true;
+              }
+              return clicked;
+            `);
+            
+            if (allButtonsClicked) {
+              console.log('Đã nhấn các nút ui-button!');
+              await humanDelay();
+            } else {
+              console.log('Không tìm thấy nút nào có class ui-button');
+            }
+          }
+        } catch (error) {
+          console.log('Lỗi khi xử lý nút Submit:', error.message);
+          // Bỏ qua lỗi này vì không ảnh hưởng đến quy trình
+        }
     
     // Kiểm tra có lỗi không sau khi nhấn Save & Continue
     try {
@@ -1129,84 +1862,125 @@ async function takeErrorScreenshot(driver, error) {
   }
   
   // Hàm chính
-  async function runAutomation() {
-    console.log('====== TỰ ĐỘNG TẠO TÀI KHOẢN ASU ======');
-    console.log('Chế độ: Tự động 100% (Cả hai trang)');
+// Cập nhật hàm chính để xử lý tất cả các trang
+async function runAutomation() {
+  console.log('====== TỰ ĐỘNG TẠO TÀI KHOẢN ASU ======');
+  console.log('Chế độ: Tự động 100% (Tất cả các trang)');
+  
+  let driver = null;
+  let accountData = null;
+  let realAddress = null;
+  
+  try {
+    // Tạo địa chỉ US thực tế
+    realAddress = generateRealUSAddress();
+    console.log(`Sử dụng địa chỉ thực tại US: ${realAddress.address}, ${realAddress.city}, ${realAddress.state} ${realAddress.zipCode}`);
     
-    let driver = null;
-    let accountData = null;
+    // Đọc email từ file Excel
+    const email = await readEmailFromExcel();
+    console.log(`Sử dụng email: ${email}`);
     
-    try {
-      // Đọc email từ file Excel
-      const email = await readEmailFromExcel();
-      console.log(`Sử dụng email: ${email}`);
+    // Khởi chạy Chrome với debugging enabled
+    await launchChromeWithDebugging();
+    
+    // Đợi Chrome mở hoàn toàn
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    
+    // Kết nối với Chrome đang chạy
+    driver = await connectToRunningChrome();
+    
+    // Mở trang ASU
+    console.log(`Mở trang tạo tài khoản ASU: ${CONFIG.ASU_URL}`);
+    await driver.get(CONFIG.ASU_URL);
+    
+    // Đợi CloudFlare và trang form
+    await waitForPageLoad(driver, 'start-my-application');
+    
+    // TRANG 1: Điền form tạo tài khoản và chuyển đến trang 2
+    console.log('\n===== TRANG 1: TẠO TÀI KHOẢN =====');
+    accountData = await fillCreateAccountForm(driver, email);
+    
+    // Đợi để page 2 load
+    await driver.sleep(3000);
+    
+    // TRANG 2: Điền form thông tin cá nhân
+    console.log('\n===== TRANG 2: THÔNG TIN CÁ NHÂN =====');
+    // Thêm thông tin địa chỉ thực
+    accountData = {
+      ...accountData,
+      address: realAddress.address,
+      city: realAddress.city,
+      state: realAddress.state,
+      zipCode: realAddress.zipCode
+    };
+    
+    accountData = await fillPersonalInfoForm(driver, accountData, email);
+    
+    // TRANG 3: Điền thông tin trường học
+    await handleEducationPage(driver, accountData);
+    
+    // TRANG 4: Xử lý trang Self-reported
+    await handleSelfReportedPage(driver);
+    
+    // TRANG 5: Xử lý trang Residency
+    await handleResidencyPage(driver, accountData);
+    
+    // TRANG 6: Xử lý trang chọn ngành học
+    await handleMajorSelectionPage(driver);
+    
+    // TRANG 7: Xử lý trang cuối cùng và submit application
+    const isSuccess = await handleFinalSubmitPage(driver);
+    
+    if (isSuccess) {
+      // Cập nhật thông tin tài khoản với trạng thái thành công
+      const finalAccountInfo = {
+        ...accountData,
+        applicationStatus: "SUCCESS",
+        completionDate: new Date().toISOString()
+      };
       
-      // Khởi chạy Chrome với debugging enabled
-      await launchChromeWithDebugging();
-      
-      // Đợi Chrome mở hoàn toàn
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
-      // Kết nối với Chrome đang chạy
-      driver = await connectToRunningChrome();
-      
-      // Mở trang ASU
-      console.log(`Mở trang tạo tài khoản ASU: ${CONFIG.ASU_URL}`);
-      await driver.get(CONFIG.ASU_URL);
-      
-      // Đợi CloudFlare và trang form
-      await waitForPageLoad(driver, 'start-my-application');
-      
-      // TRANG 1: Điền form tạo tài khoản và chuyển đến trang 2
-      console.log('\n===== TRANG 1: TẠO TÀI KHOẢN =====');
-      accountData = await fillCreateAccountForm(driver, email);
-      
-      // Đợi để page 2 load
-      await driver.sleep(3000);
-      
-      // TRANG 2: Điền form thông tin cá nhân
-      console.log('\n===== TRANG 2: THÔNG TIN CÁ NHÂN =====');
-      accountData = await fillPersonalInfoForm(driver, accountData, email);
-      
-      // Đợi một chút để xem kết quả
-      await driver.sleep(5000);
-      
-      // Chụp ảnh kết quả
-      try {
-        const timestamp = new Date().toISOString().replace(/:/g, '-');
-        const screenshotPath = path.join(CONFIG.LOG_DIR, `success_${timestamp}.png`);
-        
-        const screenshot = await driver.takeScreenshot();
-        fs.writeFileSync(screenshotPath, screenshot, 'base64');
-        
-        console.log(`Đã lưu ảnh kết quả tại: ${screenshotPath}`);
-      } catch (e) {
-        console.error('Không thể chụp ảnh kết quả:', e.message);
-      }
+      // Lưu thông tin tài khoản cuối cùng với trạng thái thành công
+      const logFile = saveAccountInfo(finalAccountInfo);
       
       console.log('\n===== HOÀN THÀNH =====');
-      console.log('Đã tạo tài khoản và điền thông tin thành công với email:', email);
+      console.log(`Đã tạo tài khoản và nộp đơn thành công với email: ${email}`);
+      console.log(`Thông tin tài khoản đã được lưu tại: ${logFile}`);
+    }
+    
+    return true;
+  } catch (error) {
+    await takeErrorScreenshot(driver, error);
+    console.error('LỖI CHẠY SCRIPT:', error.message);
+    
+    // Cập nhật thông tin tài khoản với trạng thái thất bại nếu có accountData
+    if (accountData) {
+      const failedAccountInfo = {
+        ...accountData,
+        applicationStatus: "FAILED",
+        failureReason: error.message,
+        failureDate: new Date().toISOString()
+      };
       
-      return true;
-    } catch (error) {
-      await takeErrorScreenshot(driver, error);
-      console.error('LỖI CHẠY SCRIPT:', error.message);
-      return false;
-    } finally {
-      // Đợi một chút trước khi đóng trình duyệt
-      await new Promise(resolve => setTimeout(resolve, 5000));
-      
-      if (driver) {
-        try {
-          console.log('Đóng trình duyệt Chrome...');
-          await driver.quit();
-          console.log('Đã đóng Chrome thành công.');
-        } catch (e) {
-          console.error('Lỗi khi đóng Chrome:', e.message);
-        }
+      // Lưu thông tin tài khoản với trạng thái thất bại
+      saveAccountInfo(failedAccountInfo);
+    }
+    
+    return false;
+  } finally {
+    // Đợi một chút trước khi đóng trình duyệt
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    
+    if (driver) {
+      try {
+        console.log('Đóng trình duyệt Chrome...');
+        await driver.quit();
+        console.log('Đã đóng Chrome thành công.');
+      } catch (e) {
+        console.error('Lỗi khi đóng Chrome:', e.message);
       }
     }
   }
+}
   
   // Chạy chương trình
   runAutomation()

@@ -13,3 +13,7 @@ dist
 *.tsbuildinfo
 *.tgz
 *.zip
+account_logs/
+chrome_debug_profile/
+screenshots/
+chrome_temp_profile/
