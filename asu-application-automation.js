@@ -150,128 +150,114 @@ async function connectToRunningChrome() {
 }
 
 // Hàm tạo dữ liệu ngẫu nhiên
+// Cập nhật hàm generateRandomData để sử dụng địa chỉ từ MA và TX
 function generateRandomData() {
-    // Danh sách họ phổ biến
-    const firstNames = ['John', 'Michael', 'William', 'David', 'James', 'Robert', 'Thomas', 'Daniel', 'Matthew', 'Joseph', 'Christopher', 'Anthony', 'Mark', 'Paul', 'Steven'];
-    
-    // Danh sách tên phổ biến
-    const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Miller', 'Davis', 'Wilson', 'Anderson', 'Taylor', 'Thomas', 'Jackson', 'White', 'Harris', 'Martin'];
-    
-    // Chọn ngẫu nhiên
-    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    
-    // Tạo mật khẩu theo yêu cầu
-    const password = generateASUPassword();
-    
-    // Chọn ngày sinh ngẫu nhiên (2001-2003)
-    const birthYear = Math.floor(Math.random() * 3) + 2001;
-    const birthMonth = Math.floor(Math.random() * 12) + 1;
-    const birthDay = Math.floor(Math.random() * 28) + 1; // Giới hạn 28 ngày để không gặp vấn đề với tháng 2
-    
-    // Thông tin bước 2
-    const isFemale = Math.random() > 0.5; // 50% cơ hội là nữ
-    
-    // Địa chỉ Mỹ ngẫu nhiên
-    const usAddresses = [
-      '123 Main St', '456 Oak Ave', '789 Pine Blvd', '101 Maple Dr', 
-      '202 Cedar Ln', '303 Elm St', '404 Birch Rd', '505 Spruce Way',
-      '606 Willow Ct', '707 Ash Cir'
-    ];
-    
-    const usCities = [
-      'Phoenix', 'Tucson', 'Mesa', 'Chandler', 'Scottsdale', 'Glendale', 
-      'Tempe', 'Peoria', 'Surprise', 'Gilbert'
-    ];
-    
-    const usStates = [
-      {abbr: 'AZ', name: 'Arizona'},
-      {abbr: 'CA', name: 'California'},
-      {abbr: 'TX', name: 'Texas'},
-      {abbr: 'NY', name: 'New York'},
-      {abbr: 'FL', name: 'Florida'}
-    ];
-    
-    const randomStateIndex = Math.floor(Math.random() * usStates.length);
-    const state = usStates[randomStateIndex];
-    
-    // Zip code tương ứng với các bang
-    const zipCodes = {
-      'AZ': ['85001', '85002', '85003', '85004', '85005'],
-      'CA': ['90001', '90002', '90003', '90004', '90005'],
-      'TX': ['75001', '75002', '75003', '75004', '75005'],
-      'NY': ['10001', '10002', '10003', '10004', '10005'],
-      'FL': ['32003', '32004', '32005', '32006', '32007']
-    };
-    
-    const zipCode = zipCodes[state.abbr][Math.floor(Math.random() * zipCodes[state.abbr].length)];
-    
-    // Số điện thoại di động ngẫu nhiên
-    const mobileAreaCode = Math.floor(Math.random() * 800 + 200).toString(); // 200-999
-    const mobileNumber = Math.floor(Math.random() * 9000000 + 1000000).toString(); // 1000000-9999999
-    
-    // Số điện thoại cố định (sử dụng cùng số với di động để đảm bảo nhất quán)
-    const phoneAreaCode = mobileAreaCode; 
-    const phoneNumber = mobileNumber;
-    
-    // SSN ngẫu nhiên (format hợp lệ)
-    const ssn = generateRandomSSN();
-    
-    // Thông tin phụ huynh
-    const parent1FirstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const parent1LastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    const parent2FirstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const parent2LastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    
-    // Partner/Dependent
-    const partnerFirstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const partnerLastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    
-    return {
-      firstName,
-      lastName,
-      suffix: 'IV',
-      birthMonth,
-      birthDay,
-      birthYear,
-      password,
-      // Step 2 info
-      isFemale,
-      gender: isFemale ? 'F' : 'M',
-      address: usAddresses[Math.floor(Math.random() * usAddresses.length)],
-      city: usCities[Math.floor(Math.random() * usCities.length)],
-      state: state.abbr,
-      zipCode,
-      mobileAreaCode,
-      mobileNumber,
-      phoneAreaCode,
-      phoneNumber,
-      ssn,
-      // Parents info
-      parent1: {
-        firstName: parent1FirstName,
-        lastName: parent1LastName,
-        isLiving: 'Y',
-        relation: 'Mother',
-        schoolingLevel: 'High School',
-        attendedAsu: Math.random() > 0.5 ? 'Y' : 'N'
-      },
-      parent2: {
-        firstName: parent2FirstName,
-        lastName: parent2LastName,
-        isLiving: 'Y',
-        relation: 'Father',
-        schoolingLevel: 'Other/Unknown',
-        attendedAsu: Math.random() > 0.5 ? 'Y' : 'N'
-      },
-      // Partner info
-      partner: {
-        firstName: partnerFirstName,
-        lastName: partnerLastName,
-        relationship: 'Spouse'
-      }
-    };
+  // Danh sách họ phổ biến
+  const firstNames = ['John', 'Michael', 'William', 'David', 'James', 'Robert', 'Thomas', 'Daniel', 'Matthew', 'Joseph', 'Christopher', 'Anthony', 'Mark', 'Paul', 'Steven',
+  'Andrew', 'Joshua', 'Kevin', 'Brian', 'George', 'Edward', 'Ronald', 'Timothy', 'Jason', 'Jeffrey', 'Gary', 'Ryan', 'Nicholas', 'Eric', 'Jacob', 'Jonathan', 'Justin', 'Scott', 'Brandon', 'Frank'];
+  
+  // Danh sách tên phổ biến
+  const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Miller', 'Davis', 'Wilson', 'Anderson', 'Taylor', 'Thomas', 'Jackson', 'White', 'Harris', 'Martin',
+  'Thompson', 'Garcia', 'Martinez', 'Robinson', 'Clark', 'Rodriguez', 'Lewis', 'Lee', 'Walker', 'Hall', 'Allen', 'Young', 'Hernandez', 'King', 'Wright', 'Lopez', 'Hill',
+  'Scott', 'Green', 'Adams', 'Baker', 'Gonzalez', 'Nelson', 'Carter', 'Mitchell', 'Perez', 'Roberts', 'Turner', 'Phillips', 'Campbell', 'Parker', 'Evans', 'Edwards',
+  ];
+  
+  // Chọn ngẫu nhiên
+  const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+  const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+  
+  // Tạo mật khẩu theo yêu cầu
+  const password = generateASUPassword();
+  
+  // Chọn ngày sinh ngẫu nhiên (2001-2003)
+  const birthYear = Math.floor(Math.random() * 3) + 2001;
+  const birthMonth = Math.floor(Math.random() * 12) + 1;
+  const birthDay = Math.floor(Math.random() * 28) + 1;
+  
+  // Thông tin bước 2
+  const isFemale = Math.random() > 0.5;
+  
+  // Chọn địa chỉ từ MA hoặc TX
+  const randomAddress = generateRealUSAddress();
+  
+  // Số điện thoại di động ngẫu nhiên
+  // Mã vùng cho Massachusetts: 508, 617, 781, 978
+  // Mã vùng cho Texas: 214, 281, 512, 713, 817, 832, 972
+  const maCodes = ['508', '617', '781', '978'];
+  const txCodes = ['214', '281', '512', '713', '817', '832', '972'];
+  
+  // Chọn mã vùng phù hợp với tiểu bang
+  let mobileAreaCode;
+  if (randomAddress.state === 'MA') {
+    mobileAreaCode = maCodes[Math.floor(Math.random() * maCodes.length)];
+  } else {
+    mobileAreaCode = txCodes[Math.floor(Math.random() * txCodes.length)];
   }
+  
+  const mobileNumber = Math.floor(Math.random() * 9000000 + 1000000).toString();
+  
+  // Sử dụng cùng số điện thoại cho cả di động và cố định
+  const phoneAreaCode = mobileAreaCode; 
+  const phoneNumber = mobileNumber;
+  
+  // SSN ngẫu nhiên
+  const ssn = generateRandomSSN();
+  
+  // Thông tin phụ huynh
+  const parent1FirstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+  const parent1LastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+  const parent2FirstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+  const parent2LastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+  
+  // Partner/Dependent
+  const partnerFirstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+  const partnerLastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+  
+  return {
+    firstName,
+    lastName,
+    suffix: 'IV',
+    birthMonth,
+    birthDay,
+    birthYear,
+    password,
+    // Step 2 info - fill with address from MA or TX
+    isFemale,
+    gender: isFemale ? 'F' : 'M',
+    address: randomAddress.address,
+    city: randomAddress.city,
+    state: randomAddress.state,
+    zipCode: randomAddress.zipCode,
+    mobileAreaCode,
+    mobileNumber,
+    phoneAreaCode,
+    phoneNumber,
+    ssn,
+    // Parents info
+    parent1: {
+      firstName: parent1FirstName,
+      lastName: parent1LastName,
+      isLiving: 'Y',
+      relation: 'Mother',
+      schoolingLevel: 'High School',
+      attendedAsu: Math.random() > 0.5 ? 'Y' : 'N'
+    },
+    parent2: {
+      firstName: parent2FirstName,
+      lastName: parent2LastName,
+      isLiving: 'Y',
+      relation: 'Father',
+      schoolingLevel: 'Other/Unknown',
+      attendedAsu: Math.random() > 0.5 ? 'Y' : 'N'
+    },
+    // Partner info
+    partner: {
+      firstName: partnerFirstName,
+      lastName: partnerLastName,
+      relationship: 'Spouse'
+    }
+  };
+}
   
   // Hàm tạo SSN ngẫu nhiên nhưng hợp lệ theo format
 function generateRandomSSN() {
@@ -330,8 +316,53 @@ function generateASUPassword() {
 
 // Hàm tạo địa chỉ thực tại Hoa Kỳ với zip code phù hợp
 function generateRealUSAddress() {
-  // Các địa chỉ thực tế
+  // Các địa chỉ thực tế tại Massachusetts và Texas
   const realAddresses = [
+    // Địa chỉ tại Massachusetts
+    {
+      address: '123 Tremont St',
+      city: 'Boston',
+      state: 'MA',
+      zipCode: '02108'
+    },
+    {
+      address: '45 Beacon St',
+      city: 'Boston',
+      state: 'MA',
+      zipCode: '02108'
+    },
+    {
+      address: '789 Boylston St',
+      city: 'Boston',
+      state: 'MA',
+      zipCode: '02116'
+    },
+    {
+      address: '101 Memorial Dr',
+      city: 'Cambridge',
+      state: 'MA',
+      zipCode: '02142'
+    },
+    {
+      address: '55 State St',
+      city: 'Springfield',
+      state: 'MA',
+      zipCode: '01103'
+    },
+    {
+      address: '22 Main St',
+      city: 'Worcester',
+      state: 'MA',
+      zipCode: '01608'
+    },
+    {
+      address: '333 Elm St',
+      city: 'Newton',
+      state: 'MA',
+      zipCode: '02458'
+    },
+    
+    // Địa chỉ tại Texas
     {
       address: '123 Main St',
       city: 'Dallas',
@@ -363,34 +394,112 @@ function generateRealUSAddress() {
       zipCode: '76102'
     },
     {
-      address: '333 Birch Rd',
-      city: 'Phoenix',
-      state: 'AZ',
-      zipCode: '85001'
+      address: '333 Cedar Rd',
+      city: 'Plano',
+      state: 'TX',
+      zipCode: '75024'
     },
     {
-      address: '444 Spruce Way',
-      city: 'Tucson',
-      state: 'AZ',
-      zipCode: '85701'
+      address: '444 Pecan St',
+      city: 'Irving',
+      state: 'TX',
+      zipCode: '75039'
     },
     {
-      address: '555 Cedar Ln',
-      city: 'Mesa',
-      state: 'AZ',
-      zipCode: '85201'
+      address: '555 Walnut St',
+      city: 'Corpus Christi',
+      state: 'TX',
+      zipCode: '78401'
     },
     {
-      address: '666 Willow Ct',
-      city: 'Chandler',
-      state: 'AZ',
-      zipCode: '85225'
+      address: '666 Birch St',
+      city: 'Laredo',
+      state: 'TX',
+      zipCode: '78040'
     },
     {
-      address: '777 Ash Cir',
-      city: 'Scottsdale',
-      state: 'AZ',
-      zipCode: '85251'
+      address: '777 Spruce St',
+      city: 'Lubbock',
+      state: 'TX',
+      zipCode: '79401'
+    },
+    {
+      address: '888 Willow St',
+      city: 'Garland',
+      state: 'TX',
+      zipCode: '75040'
+    },
+    {
+      address: '999 Cypress St',
+      city: 'Amarillo',
+      state: 'TX',
+      zipCode: '79101'
+    },
+    {
+      address: '1010 Ash St',
+      city: 'Grand Prairie',
+      state: 'TX',
+      zipCode: '75050'
+    },
+    {
+      address: '1111 Fir St',
+      city: 'McKinney',
+      state: 'TX',
+      zipCode: '75069'
+    },
+    {
+      address: '1212 Hickory St',
+      city: 'Frisco',
+      state: 'TX',
+      zipCode: '75034'
+    },
+    {
+      address: '1313 Palm St',
+      city: 'Mesquite',
+      state: 'TX',
+      zipCode: '75149'
+    },
+    {
+      address: '1414 Magnolia St',
+      city: 'Carrollton',
+      state: 'TX',
+      zipCode: '75006'
+    },
+    {
+      address: '1515 Chestnut St',
+      city: 'Denton',
+      state: 'TX',
+      zipCode: '76201'
+    },
+    {
+      address: '1616 Oakwood St',
+      city: 'Waco',
+      state: 'TX',
+      zipCode: '76701'
+    },
+    {
+      address: '1717 Maplewood St',
+      city: 'Abilene',
+      state: 'TX',
+      zipCode: '79601'
+    },
+    {
+      address: '1818 Redwood St',
+      city: 'Killeen',
+      state: 'TX',
+      zipCode: '76540'
+    },
+    {
+      address: '1919 Cedarwood St',
+      city: 'Tyler',
+      state: 'TX',
+      zipCode: '75701'
+    },
+    {
+      address: '2020 Oakridge St',
+      city: 'Longview',
+      state: 'TX',
+      zipCode: '75601'
     }
   ];
   
@@ -699,7 +808,102 @@ async function handleResidencyPage(driver, userData) {
   }
 }
 
+// Add these helper functions to improve debugging of the modal selection
+
+// Function to help debug modal elements
+async function debugModalElements(driver) {
+  console.log('Debugging modal elements...');
+  
+  try {
+    // Get all radio buttons
+    const radioButtons = await driver.findElements(By.css('input[type="radio"]'));
+    console.log(`Found ${radioButtons.length} total radio buttons on page`);
+    
+    // Get specifically the terms-for-major-all radio buttons
+    const termRadios = await driver.findElements(By.css('input[name="terms-for-major-all"]'));
+    console.log(`Found ${termRadios.length} radio buttons with name="terms-for-major-all"`);
+    
+    // List all values of the term radio buttons
+    if (termRadios.length > 0) {
+      console.log('Values of available radio buttons:');
+      for (let i = 0; i < termRadios.length; i++) {
+        const value = await termRadios[i].getAttribute('value');
+        const id = await termRadios[i].getAttribute('id');
+        const isChecked = await termRadios[i].isSelected();
+        console.log(`[${i}] value="${value}", id="${id}", checked=${isChecked}`);
+      }
+    }
+    
+    // Check if our specific radio button exists
+    try {
+      const targetRadio = await driver.findElement(By.css('input[value="2254-SESA"]'));
+      console.log('Target radio button with value="2254-SESA" exists!');
+      const isVisible = await targetRadio.isDisplayed();
+      console.log(`Is it visible? ${isVisible}`);
+      
+      // Get parent elements to check if inside hidden container
+      const parentElementClass = await driver.executeScript(`
+        const radio = document.querySelector('input[value="2254-SESA"]');
+        if (radio) {
+          let parent = radio.parentElement;
+          let classes = [];
+          while (parent && parent.tagName !== 'BODY') {
+            classes.push(parent.className);
+            parent = parent.parentElement;
+          }
+          return classes;
+        }
+        return [];
+      `);
+      
+      console.log('Parent element classes:', parentElementClass);
+    } catch (e) {
+      console.log('Target radio button does not exist:', e.message);
+    }
+  } catch (error) {
+    console.error('Error during modal debugging:', error);
+  }
+}
+
+// Enhanced wait function with explicit wait for the modal
+async function waitForModalAndRadioButtons(driver, timeout = 10000) {
+  console.log(`Waiting up to ${timeout}ms for modal with radio buttons...`);
+  
+  try {
+    // First wait for any modal or dialog to appear
+    await driver.wait(async () => {
+      const modals = await driver.findElements(By.css('.ui-dialog, .modal, [role="dialog"]'));
+      return modals.length > 0;
+    }, timeout, 'No modal dialog appeared');
+    
+    console.log('Modal appeared, now waiting for radio buttons...');
+    
+    // Then wait for radio buttons within the modal
+    await driver.wait(async () => {
+      const radioButtons = await driver.findElements(By.css('input[name="terms-for-major-all"]'));
+      return radioButtons.length > 0;
+    }, timeout, 'No radio buttons found in modal');
+    
+    console.log('Radio buttons are now available');
+    
+    // Give a moment for any animations to complete
+    await driver.sleep(1000);
+    
+    return true;
+  } catch (error) {
+    console.error('Error waiting for modal:', error.message);
+    // Run debug function to get more information
+    await debugModalElements(driver);
+    return false;
+  }
+}
+
+
+
 // Hàm xử lý trang chọn ngành học (trang 6)
+// Replace the entire handleMajorSelectionPage function with this version
+// Complete Major Selection Process handling both first and second major
+// Complete Major Selection Process handling both first and second major
 async function handleMajorSelectionPage(driver) {
   console.log('\n===== TRANG 6: MAJOR SELECTION =====');
   
@@ -721,192 +925,410 @@ async function handleMajorSelectionPage(driver) {
       return true;
     }
     
-    console.log('Click Search button cho Course by Location');
-try {
-  // Tìm nút Search chính xác bằng thuộc tính onclick
-  const searchButton = await driver.findElement(By.css("input[value='Search'][onclick='doLocationSearch();']"));
-  
-  if (searchButton) {
-    await scrollToElement(driver, searchButton);
-    await safeClick(driver, searchButton);
-    await humanDelay();
-    console.log('Đã click nút Search cho Location Search');
-  }
-} catch (error) {
-  console.log('Không tìm thấy nút Search chính xác qua CSS, thử XPath...');
-  
-  try {
-    // Thử tìm bằng XPath
-    const searchButtonXPath = await driver.findElement(By.xpath("//input[@value='Search' and @onclick='doLocationSearch();']"));
-    await scrollToElement(driver, searchButtonXPath);
-    await safeClick(driver, searchButtonXPath);
-    await humanDelay();
-    console.log('Đã click nút Search qua XPath');
-  } catch (e) {
-    console.log('Không tìm thấy nút Search qua XPath, thử click trực tiếp qua JS...');
+    // ======= PHẦN 1: CHỌN MAJOR THỨ NHẤT =======
+    console.log('\n--- PHẦN 1: CHỌN MAJOR THỨ NHẤT ---');
     
-    // Dùng JavaScript để click
-    const jsClicked = await driver.executeScript(`
-      const buttons = document.querySelectorAll("input[value='Search']");
-      for (let btn of buttons) {
-        if (btn.getAttribute('onclick') === 'doLocationSearch();') {
-          btn.click();
-          return true;
+    // 1.1. Click Search button cho Location
+    console.log('Click Search button cho Course by Location');
+    try {
+      // Tìm nút Search chính xác bằng thuộc tính onclick
+      const searchButton = await driver.findElement(By.css("input[value='Search'][onclick='doLocationSearch();']"));
+      
+      if (searchButton) {
+        await scrollToElement(driver, searchButton);
+        await safeClick(driver, searchButton);
+        await humanDelay();
+        console.log('Đã click nút Search cho Location Search');
+      }
+    } catch (error) {
+      console.log('Không tìm thấy nút Search chính xác qua CSS, thử XPath...');
+      
+      try {
+        // Thử tìm bằng XPath
+        const searchButtonXPath = await driver.findElement(By.xpath("//input[@value='Search' and @onclick='doLocationSearch();']"));
+        await scrollToElement(driver, searchButtonXPath);
+        await safeClick(driver, searchButtonXPath);
+        await humanDelay();
+        console.log('Đã click nút Search qua XPath');
+      } catch (e) {
+        console.log('Không tìm thấy nút Search qua XPath, thử JavaScript...');
+        
+        // Dùng JavaScript để click
+        const jsClicked = await driver.executeScript(`
+          const buttons = document.querySelectorAll("input[value='Search']");
+          for (let btn of buttons) {
+            if (btn.getAttribute('onclick') === 'doLocationSearch();') {
+              btn.click();
+              return true;
+            }
+          }
+          return false;
+        `);
+        
+        if (jsClicked) {
+          console.log('Đã click nút Search qua JavaScript');
+          await humanDelay();
+        } else {
+          console.log('Không thể click nút Search, bỏ qua bước này');
         }
       }
-      return false;
-    `);
-    
-    if (jsClicked) {
-      console.log('Đã click nút Search qua JavaScript');
-      await humanDelay();
-    } else {
-      console.log('Không thể click nút Search, bỏ qua bước này');
     }
-  }
-}
     
-    // 2. Click Choose button để chọn ngành
-    console.log('Click Choose button để chọn ngành');
+    // Đợi kết quả search
+    await driver.sleep(2000);
+    
+    // 1.2. Click Choose button để chọn major đầu tiên
+    console.log('Click Choose button để chọn major đầu tiên');
     try {
       const chooseButton = await driver.findElement(By.css('.choose.localStore'));
       await scrollToElement(driver, chooseButton);
       await safeClick(driver, chooseButton);
       await humanDelay();
+      console.log('Đã click Choose button cho major đầu tiên');
     } catch (error) {
-      console.log('Không tìm thấy nút Choose, thử cách khác');
+      console.log('Không tìm thấy nút Choose đầu tiên qua CSS, thử XPath...');
       
-      // Thử tìm nút Choose bằng XPath
       try {
         const chooseButton = await driver.findElement(By.xpath("//input[@value='Choose']"));
         await scrollToElement(driver, chooseButton);
         await safeClick(driver, chooseButton);
         await humanDelay();
+        console.log('Đã click Choose button đầu tiên qua XPath');
       } catch (e) {
-        console.log('Không tìm thấy nút Choose bằng XPath, bỏ qua bước này');
+        console.log('Không tìm thấy nút Choose đầu tiên qua XPath, thử JavaScript...');
+        
+        const jsClicked = await driver.executeScript(`
+          const chooseButtons = document.querySelectorAll("input[value='Choose']");
+          if (chooseButtons.length > 0) {
+            chooseButtons[0].click();
+            return true;
+          }
+          return false;
+        `);
+        
+        if (jsClicked) {
+          console.log('Đã click Choose button đầu tiên qua JavaScript');
+          await humanDelay();
+        } else {
+          console.log('Không thể click Choose button đầu tiên');
+        }
       }
     }
     
-    // 3. Đợi modal hiện ra và chọn một option ngẫu nhiên
-    // 3. Đợi modal hiện ra và chọn một option ngẫu nhiên
-  try {
-    await driver.wait(until.elementLocated(By.css('input[name="terms-for-major-all"]')), 8000);
-    console.log('Modal đã hiện ra, chọn một option ngẫu nhiên');
+    // 1.3. Đợi modal hiện ra và chọn radio button cho major đầu tiên
+    console.log('Đợi modal hiển thị cho major đầu tiên...');
+    await driver.sleep(2000);
     
-    // Tìm chính xác các radio button mong muốn
-    const targetRadios = await driver.findElements(By.css('input[name="terms-for-major-all"][value="2254-SESA"], input[name="terms-for-major-all"][value="2254-SESB"]'));
-    
-    if (targetRadios.length > 0) {
-      // Chọn một option ngẫu nhiên từ các radio button đã tìm được
-      const randomIndex = Math.floor(Math.random() * targetRadios.length);
-      const selectedOption = targetRadios[randomIndex];
-      
-      // Lấy giá trị của radio button đã chọn để ghi log
-      const radioValue = await selectedOption.getAttribute('value');
-      console.log(`Chọn radio button với giá trị: ${radioValue}`);
-      
-      await scrollToElement(driver, selectedOption);
-      await safeClick(driver, selectedOption);
+    try {
+      // Tìm và chọn radio button
+      const firstRadio = await driver.findElement(By.css('input[name="terms-for-major-all"]'));
+      await scrollToElement(driver, firstRadio);
+      await safeClick(driver, firstRadio);
+      console.log('Đã chọn radio button cho major đầu tiên');
       await humanDelay();
+    } catch (error) {
+      console.log('Không tìm thấy radio button cho major đầu tiên, thử JavaScript...');
       
-      // 4. Click Add Major
-      console.log('Click Add Major');
-      const addMajorButton = await driver.findElement(By.css('input[value="Add Major"]'));
-      await scrollToElement(driver, addMajorButton);
-      await safeClick(driver, addMajorButton);
-      await humanDelay();
-    } else {
-      console.log('Không tìm thấy các radio button cụ thể, thử tìm bất kỳ radio button nào');
+      const jsClicked = await driver.executeScript(`
+        const radios = document.querySelectorAll('input[name="terms-for-major-all"]');
+        if (radios.length > 0) {
+          radios[0].click();
+          return true;
+        }
+        return false;
+      `);
       
-      // Nếu không tìm thấy radio button cụ thể, thì chọn bất kỳ radio button nào
-      const anyRadios = await driver.findElements(By.css('input[name="terms-for-major-all"]'));
-      if (anyRadios.length > 0) {
-        const randomIndex = Math.floor(Math.random() * anyRadios.length);
-        const selectedOption = anyRadios[randomIndex];
-        await scrollToElement(driver, selectedOption);
-        await safeClick(driver, selectedOption);
-        await humanDelay();
-        
-        // Click Add Major
-        console.log('Click Add Major');
-        const addMajorButton = await driver.findElement(By.css('input[value="Add Major"]'));
-        await scrollToElement(driver, addMajorButton);
-        await safeClick(driver, addMajorButton);
+      if (jsClicked) {
+        console.log('Đã chọn radio button cho major đầu tiên qua JavaScript');
         await humanDelay();
       } else {
-        console.log('Không tìm thấy radio button options trong modal, bỏ qua bước này');
+        console.log('Không thể chọn radio button cho major đầu tiên');
       }
     }
-  } catch (error) {
-    console.log('Không tìm thấy modal hoặc hết thời gian chờ:', error.message);
-  }
     
-    // 5. Chọn một interest ngẫu nhiên
-    console.log('Chọn một interest ngẫu nhiên');
+    // 1.4. Click Add Major sau khi chọn radio button
+    console.log('Click Add Major cho major đầu tiên');
+    try {
+      const addMajorButton = await driver.findElement(By.css("input[value='Add Major'][onclick*='validateAndSet']"));
+      await scrollToElement(driver, addMajorButton);
+      await safeClick(driver, addMajorButton);
+      console.log('Đã click Add Major cho major đầu tiên');
+      await humanDelay();
+    } catch (error) {
+      console.log('Không tìm thấy nút Add Major cho major đầu tiên, thử cách khác...');
+      
+      try {
+        const addMajorButton = await driver.findElement(By.css("input[value='Add Major']"));
+        await scrollToElement(driver, addMajorButton);
+        await safeClick(driver, addMajorButton);
+        console.log('Đã click Add Major cho major đầu tiên (cách 2)');
+        await humanDelay();
+      } catch (e) {
+        console.log('Không tìm thấy nút Add Major cho major đầu tiên, thử JavaScript...');
+        
+        const jsClicked = await driver.executeScript(`
+          const addButtons = document.querySelectorAll("input[value='Add Major']");
+          if (addButtons.length > 0) {
+            addButtons[0].click();
+            return true;
+          }
+          return false;
+        `);
+        
+        if (jsClicked) {
+          console.log('Đã click Add Major cho major đầu tiên qua JavaScript');
+          await humanDelay();
+        } else {
+          console.log('Không thể click Add Major cho major đầu tiên');
+        }
+      }
+    }
+    
+    // ======= PHẦN 2: CHỌN MAJOR THỨ HAI (SECOND MAJOR) =======
+    console.log('\n--- PHẦN 2: CHỌN MAJOR THỨ HAI ---');
+    await driver.sleep(2000);
+    
+    // 2.1. Chọn "Business" trong Secondary Interest dropdown
+    console.log('Chọn "Business" trong Secondary Interest dropdown');
     try {
       const interestSelect = await driver.findElement(By.id('form-app-secondary-interests'));
       await scrollToElement(driver, interestSelect);
       
-      // Lấy tất cả các options trừ option đầu tiên (Choose...)
-      const interestOptions = await driver.executeScript(`
+      // Chọn "Business" trong dropdown
+      await driver.executeScript(`
         const select = arguments[0];
-        // Lấy tất cả các options trừ option đầu tiên (Choose...)
-        const options = [];
-        for (let i = 1; i < select.options.length; i++) {
-          options.push(select.options[i].value);
+        for (let i = 0; i < select.options.length; i++) {
+          if (select.options[i].text === 'Business') {
+            select.selectedIndex = i;
+            const event = new Event('change', { bubbles: true });
+            select.dispatchEvent(event);
+            break;
+          }
         }
-        return options;
       `, interestSelect);
       
-      if (interestOptions.length > 0) {
-        // Chọn một option ngẫu nhiên
-        const randomInterestIndex = Math.floor(Math.random() * interestOptions.length);
-        const selectedInterest = interestOptions[randomInterestIndex];
-        
-        await driver.executeScript(`
-          const select = arguments[0];
-          select.value = '${selectedInterest}';
-          const event = new Event('change', { bubbles: true });
-          select.dispatchEvent(event);
-        `, interestSelect);
-        await humanDelay();
-      }
+      console.log('Đã chọn "Business" trong Secondary Interest dropdown');
+      await humanDelay();
     } catch (error) {
-      console.log('Không tìm thấy dropdown interest:', error.message);
+      console.log('Không tìm thấy Secondary Interest dropdown:', error.message);
     }
     
-    // 6. Tick checkbox "Future opportunities"
+    // 2.2. Tick checkbox "Future opportunities"
     try {
       console.log('Tick checkbox "Future opportunities"');
       const futureCheckbox = await driver.findElement(By.id('teacher-cert-interest'));
       await scrollToElement(driver, futureCheckbox);
       await safeClick(driver, futureCheckbox);
+      console.log('Đã tick checkbox Future opportunities');
       await humanDelay();
     } catch (e) {
-      console.log('Không tìm thấy checkbox Future opportunities, bỏ qua');
+      console.log('Không tìm thấy checkbox Future opportunities:', e.message);
     }
     
-    // 7. Click Save & Continue
+    // 2.3. Click nút Search cho Secondary Interest
+    console.log('Click nút Search cho Secondary Interest');
+    try {
+      // Tìm nút Search với onclick="doInterestsSecondarySearch();"
+      const searchButton = await driver.findElement(By.css("input.search-button[onclick='doInterestsSecondarySearch();']"));
+      await scrollToElement(driver, searchButton);
+      await safeClick(driver, searchButton);
+      console.log('Đã click nút Search cho Secondary Interest');
+      await humanDelay();
+    } catch (error) {
+      console.log('Không tìm thấy nút Search cho Secondary Interest qua CSS, thử XPath...');
+      
+      try {
+        const searchButtonXPath = await driver.findElement(By.xpath("//input[@value='Search' and @onclick='doInterestsSecondarySearch();']"));
+        await scrollToElement(driver, searchButtonXPath);
+        await safeClick(driver, searchButtonXPath);
+        console.log('Đã click nút Search cho Secondary Interest qua XPath');
+        await humanDelay();
+      } catch (e) {
+        console.log('Không tìm thấy nút Search cho Secondary Interest qua XPath, thử JavaScript...');
+        
+        const jsClicked = await driver.executeScript(`
+          const buttons = document.querySelectorAll("input[value='Search']");
+          for (let btn of buttons) {
+            if (btn.getAttribute('onclick') === 'doInterestsSecondarySearch();') {
+              btn.click();
+              return true;
+            }
+          }
+          return false;
+        `);
+        
+        if (jsClicked) {
+          console.log('Đã click nút Search cho Secondary Interest qua JavaScript');
+          await humanDelay();
+        } else {
+          console.log('Không thể click nút Search cho Secondary Interest');
+        }
+      }
+    }
+    
+    // Đợi kết quả search
+    await driver.sleep(2000);
+    
+    // 2.4. Click Choose button cho major thứ hai
+    console.log('Click Choose button cho major thứ hai');
+    try {
+      // Dùng ID và class từ HTML bạn cung cấp
+      const chooseButton = await driver.findElement(By.css("input#form-app-major.tips.choose.localStore[value='Choose']"));
+      await scrollToElement(driver, chooseButton);
+      await safeClick(driver, chooseButton);
+      console.log('Đã click Choose button cho major thứ hai');
+      await humanDelay();
+    } catch (error) {
+      console.log('Không tìm thấy nút Choose cho major thứ hai qua CSS chính xác, thử CSS đơn giản...');
+      
+      try {
+        const chooseButton = await driver.findElement(By.css("input[value='Choose']"));
+        await scrollToElement(driver, chooseButton);
+        await safeClick(driver, chooseButton);
+        console.log('Đã click Choose button cho major thứ hai qua CSS đơn giản');
+        await humanDelay();
+      } catch (e) {
+        console.log('Không tìm thấy nút Choose cho major thứ hai qua CSS đơn giản, thử JavaScript...');
+        
+        const jsClicked = await driver.executeScript(`
+          const chooseButtons = document.querySelectorAll("input[value='Choose']");
+          if (chooseButtons.length > 0) {
+            // Thử chọn nút Choose thứ hai nếu có
+            if (chooseButtons.length > 1) {
+              chooseButtons[1].click();
+            } else {
+              chooseButtons[0].click();
+            }
+            return true;
+          }
+          return false;
+        `);
+        
+        if (jsClicked) {
+          console.log('Đã click Choose button cho major thứ hai qua JavaScript');
+          await humanDelay();
+        } else {
+          console.log('Không thể click Choose button cho major thứ hai');
+        }
+      }
+    }
+    
+    // 2.5. Chọn radio button trong modal (sử dụng value="2254-SESA" như bạn đã cung cấp)
+    console.log('Đợi modal hiển thị cho major thứ hai...');
+    await driver.sleep(2000);
+    
+    console.log('Tìm và chọn radio button có value="2254-SESA"');
+    try {
+      const targetRadio = await driver.findElement(By.css('input[name="terms-for-major-all"][value="2254-SESA"]'));
+      await scrollToElement(driver, targetRadio);
+      await safeClick(driver, targetRadio);
+      console.log('Đã chọn radio button có value="2254-SESA"');
+      await humanDelay();
+    } catch (error) {
+      console.log('Không tìm thấy radio button có value="2254-SESA", thử JavaScript...');
+      
+      const jsClicked = await driver.executeScript(`
+        const radio = document.querySelector('input[name="terms-for-major-all"][value="2254-SESA"]');
+        if (radio) {
+          radio.click();
+          return true;
+        }
+        
+        // Nếu không tìm thấy, chọn radio button đầu tiên
+        const anyRadio = document.querySelector('input[name="terms-for-major-all"]');
+        if (anyRadio) {
+          anyRadio.click();
+          return true;
+        }
+        
+        return false;
+      `);
+      
+      if (jsClicked) {
+        console.log('Đã chọn radio button cho major thứ hai qua JavaScript');
+        await humanDelay();
+      } else {
+        console.log('Không thể chọn radio button cho major thứ hai');
+      }
+    }
+    
+    // 2.6. Click Add Major sau khi chọn radio button
+    console.log('Click Add Major cho major thứ hai');
+    try {
+      // Sử dụng selector chính xác theo HTML bạn cung cấp
+      const addMajorButton = await driver.findElement(By.css("input[value='Add Major'][onclick*='validateAndSetSecondarySelection']"));
+      await scrollToElement(driver, addMajorButton);
+      await safeClick(driver, addMajorButton);
+      console.log('Đã click Add Major cho major thứ hai');
+      await humanDelay();
+    } catch (error) {
+      console.log('Không tìm thấy nút Add Major cho major thứ hai qua CSS chính xác, thử CSS đơn giản...');
+      
+      try {
+        const addMajorButton = await driver.findElement(By.css("input[value='Add Major']"));
+        await scrollToElement(driver, addMajorButton);
+        await safeClick(driver, addMajorButton);
+        console.log('Đã click Add Major cho major thứ hai qua CSS đơn giản');
+        await humanDelay();
+      } catch (e) {
+        console.log('Không tìm thấy nút Add Major cho major thứ hai qua CSS đơn giản, thử JavaScript...');
+        
+        const jsClicked = await driver.executeScript(`
+          const addButtons = document.querySelectorAll("input[value='Add Major']");
+          if (addButtons.length > 0) {
+            addButtons[0].click();
+            return true;
+          }
+          return false;
+        `);
+        
+        if (jsClicked) {
+          console.log('Đã click Add Major cho major thứ hai qua JavaScript');
+          await humanDelay();
+        } else {
+          console.log('Không thể click Add Major cho major thứ hai');
+        }
+      }
+    }
+    
+    // 2.7. Click Save & Continue sau khi thêm cả hai major
     console.log('Click Save & Continue');
     try {
+      // Sử dụng ID chính xác theo HTML bạn cung cấp
       const saveButton = await driver.findElement(By.id('selected-major-save-continue-btn'));
       await scrollToElement(driver, saveButton);
       await safeClick(driver, saveButton);
+      console.log('Đã click Save & Continue');
     } catch (error) {
-      console.log('Không tìm thấy nút Save & Continue theo ID, thử cách khác');
+      console.log('Không tìm thấy nút Save & Continue theo ID, thử CSS...');
       
-      // Thử tìm nút Save & Continue bằng XPath
       try {
-        const saveButton = await driver.findElement(By.xpath("//input[@value='Save & Continue']"));
-        await scrollToElement(driver, saveButton);
-        await safeClick(driver, saveButton);
+        const saveButtonCSS = await driver.findElement(By.css("input[value='Save & Continue']"));
+        await scrollToElement(driver, saveButtonCSS);
+        await safeClick(driver, saveButtonCSS);
+        console.log('Đã click Save & Continue qua CSS');
       } catch (e) {
-        console.log('Không tìm thấy nút Save & Continue bằng XPath, bỏ qua');
+        console.log('Không tìm thấy nút Save & Continue qua CSS, thử JavaScript...');
+        
+        const jsClicked = await driver.executeScript(`
+          const saveButton = document.querySelector("#selected-major-save-continue-btn, input[value='Save & Continue']");
+          if (saveButton) {
+            saveButton.click();
+            return true;
+          }
+          return false;
+        `);
+        
+        if (jsClicked) {
+          console.log('Đã click Save & Continue qua JavaScript');
+        } else {
+          console.log('Không thể click Save & Continue');
+        }
       }
     }
     
     // Ghi log thành công
-    console.log('Đã hoàn thành điền form trang 6 (Major Selection)!');
+    console.log('Đã hoàn thành điền form trang 6 (Major Selection) với cả hai major!');
     
     // Đợi chuyển trang
     await driver.sleep(3000);
