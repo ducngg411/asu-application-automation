@@ -23,6 +23,57 @@ const CONFIG = {
   }
 };
 
+let chromeInstanceRunning = false;
+
+// Then modify the launchChromeWithDebugging function:
+async function launchChromeWithDebugging() {
+  // Only start Chrome if one isn't already running
+  if (chromeInstanceRunning) {
+    console.log('Chrome is already running, reusing existing instance');
+    return true;
+  }
+  
+  console.log('Khởi động Chrome với chế độ remote debugging...');
+  
+  return new Promise((resolve, reject) => {
+    try {
+      // Tạo thư mục profile tạm thời
+      const tempProfileDir = path.join(__dirname, 'chrome_debug_profile');
+      if (!fs.existsSync(tempProfileDir)) {
+        fs.mkdirSync(tempProfileDir, { recursive: true });
+      }
+      
+      // Lệnh để chạy Chrome với remote debugging
+      const chromeCommand = `"${CONFIG.CHROME_PATH}" --remote-debugging-port=${CONFIG.DEBUGGING_PORT} --user-data-dir="${tempProfileDir}"`;
+      
+      // Sử dụng exec để mở Chrome
+      exec(chromeCommand, { windowsHide: false });
+      
+      // Đợi Chrome khởi động
+      setTimeout(() => {
+        console.log('Chrome đã được mở thành công.');
+        chromeInstanceRunning = true;
+        resolve(true);
+      }, 3000);
+    } catch (error) {
+      console.error('LỖI khi khởi động Chrome:', error);
+      reject(error);
+    }
+  });
+}
+
+// Then add this to close Chrome when finished:
+function closeChrome() {
+  try {
+    console.log('Đóng trình duyệt Chrome...');
+    const processes = exec('taskkill /F /IM chrome.exe', { windowsHide: true });
+    chromeInstanceRunning = false;
+    console.log('Đã đóng Chrome thành công.');
+  } catch (e) {
+    console.error('Lỗi khi đóng Chrome:', e.message);
+  }
+}
+
 // Đảm bảo thư mục logs tồn tại
 if (!fs.existsSync(CONFIG.LOG_DIR)) {
   fs.mkdirSync(CONFIG.LOG_DIR, { recursive: true });
@@ -2712,16 +2763,3 @@ async function runAutomation() {
   
   // Chạy chương trình
  // Chạy chương trình
-runAutomation()
-.then(success => {
-  if (success) {
-    console.log('\nSCRIPT HOÀN THÀNH THÀNH CÔNG');
-  } else {
-    console.log('\nSCRIPT HOÀN THÀNH VỚI LỖI');
-  }
-  process.exit(0);
-})
-.catch(error => {
-  console.error('\nSCRIPT THẤT BẠI:', error);
-  process.exit(1);
-});
