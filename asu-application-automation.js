@@ -50,9 +50,10 @@ async function typeHumanLike(element, text) {
 }
 
 // Hàm đọc email từ file Excel
-async function readEmailFromExcel() {
+// Sửa đổi hàm đọc email từ Excel để trả về tất cả email
+async function readEmailsFromExcel() {
   try {
-    console.log(`Đọc email từ file: ${CONFIG.EXCEL_PATH}`);
+    console.log(`Đọc danh sách email từ file: ${CONFIG.EXCEL_PATH}`);
     
     if (!fs.existsSync(CONFIG.EXCEL_PATH)) {
       throw new Error(`Không tìm thấy file Excel tại: ${CONFIG.EXCEL_PATH}`);
@@ -72,22 +73,255 @@ async function readEmailFromExcel() {
       throw new Error('Sheet Excel trống hoặc không có dữ liệu hợp lệ');
     }
     
-    const emails = data.map(row => row.email || row.Email || '').filter(email => email && email.includes('@'));
+    // Lọc email hợp lệ
+    const emails = [];
+    for (const row of data) {
+      const email = row.email || row.Email || '';
+      if (email && email.includes('@') && !email.includes(',')) {
+        emails.push(email.trim());
+      }
+    }
     
     if (emails.length === 0) {
       throw new Error('Không tìm thấy email hợp lệ. Đảm bảo có cột tên "email" hoặc "Email"');
     }
     
-    console.log(`Đã đọc ${emails.length} email từ Excel`);
-    // Trả về email đầu tiên
-    return emails[0];
+    console.log(`Đã đọc ${emails.length} email hợp lệ từ Excel`);
+    return emails;
   } catch (error) {
     console.error('LỖI khi đọc email từ Excel:', error);
-    // Nếu không đọc được từ Excel, trả về email mặc định
+    // Nếu không đọc được từ Excel, trả về một mảng với email mặc định
     console.log('Sử dụng email mặc định thay thế');
-    return 'test' + Math.floor(Math.random() * 1000) + '@example.com';
+    return ['test' + Math.floor(Math.random() * 1000) + '@example.com'];
   }
 }
+
+// Cập nhật hàm chính để xử lý nhiều email
+async function processAllEmails() {
+  console.log('====== TỰ ĐỘNG TẠO TÀI KHOẢN ASU - NHIỀU EMAIL ======');
+  
+  try {
+    // Đọc tất cả email từ file Excel
+    const emails = await readEmailsFromExcel();
+    console.log(`Tìm thấy ${emails.length} email để xử lý`);
+    
+    // Mảng lưu kết quả xử lý của từng email
+    const results = [];
+    
+    // Khởi chạy Chrome một lần
+    await launchChromeWithDebugging();
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    
+    // Xử lý từng email
+    for (let i = 0; i < emails.length; i++) {
+      const email = emails[i];
+      console.log(`\n===== XỬ LÝ EMAIL ${i+1}/${emails.length}: ${email} =====`);
+      
+      const result = await processEmail(email, i);
+      results.push(result);
+      
+      // Lưu kết quả tổng hợp
+      saveResults(results);
+      
+      // Đợi một chút trước khi xử lý email tiếp theo
+      if (i < emails.length - 1) {
+        console.log(`Đợi 5 giây trước khi xử lý email tiếp theo...`);
+        await new Promise(resolve => setTimeout(resolve, 5000));
+      }
+    }
+    
+    console.log('\n===== KẾT QUẢ TỔNG HỢP =====');
+    console.log(`Tổng số email đã xử lý: ${results.length}`);
+    const successful = results.filter(r => r.status === 'SUCCESS').length;
+    console.log(`Thành công: ${successful}/${results.length}`);
+    console.log(`Thất bại: ${results.length - successful}/${results.length}`);
+    
+    return true;
+  } catch (error) {
+    console.error('LỖI CHẠY SCRIPT NHIỀU EMAIL:', error.message);
+    return false;
+  } finally {
+    try {
+      // Đóng Chrome sau khi xử lý tất cả email
+      console.log('Đóng trình duyệt Chrome...');
+      const processes = exec('taskkill /F /IM chrome.exe', { windowsHide: true });
+      console.log('Đã đóng Chrome thành công.');
+    } catch (e) {
+      console.error('Lỗi khi đóng Chrome:', e.message);
+    }
+  }
+}
+
+// Hàm xử lý một email
+async function processEmail(email, index) {
+  let driver = null;
+  let accountData = null;
+  let realAddress = null;
+  const startTime = new Date();
+  
+  try {
+    console.log(`Bắt đầu xử lý email: ${email}`);
+    
+    // Tạo địa chỉ US thực tế
+    realAddress = generateRealUSAddress();
+    console.log(`Sử dụng địa chỉ thực tại US: ${realAddress.address}, ${realAddress.city}, ${realAddress.state} ${realAddress.zipCode}`);
+    
+    // Kết nối với Chrome đang chạy
+    driver = await connectToRunningChrome();
+    
+    // Mở trang ASU
+    console.log(`Mở trang tạo tài khoản ASU: ${CONFIG.ASU_URL}`);
+    await driver.get(CONFIG.ASU_URL);
+    
+    // Đợi CloudFlare và trang form
+    await waitForPageLoad(driver, 'start-my-application');
+    
+    // TRANG 1: Điền form tạo tài khoản và chuyển đến trang 2
+    console.log('\n===== TRANG 1: TẠO TÀI KHOẢN =====');
+    accountData = await fillCreateAccountForm(driver, email);
+    
+    // Đợi để page 2 load
+    await driver.sleep(3000);
+    
+    // TRANG 2: Điền form thông tin cá nhân
+    console.log('\n===== TRANG 2: THÔNG TIN CÁ NHÂN =====');
+    // Thêm thông tin địa chỉ thực
+    accountData = {
+      ...accountData,
+      address: realAddress.address,
+      city: realAddress.city,
+      state: realAddress.state,
+      zipCode: realAddress.zipCode
+    };
+    
+    accountData = await fillPersonalInfoForm(driver, accountData, email);
+    
+    // TRANG 3: Điền thông tin trường học
+    await handleEducationPage(driver, accountData);
+    
+    // TRANG 4: Xử lý trang Self-reported
+    await handleSelfReportedPage(driver);
+    
+    // TRANG 5: Xử lý trang Residency
+    await handleResidencyPage(driver, accountData);
+    
+    // TRANG 6: Xử lý trang chọn ngành học
+    await handleMajorSelectionPage(driver);
+    
+    // TRANG 7: Xử lý trang cuối cùng và submit application
+    const isSuccess = await handleFinalSubmitPage(driver);
+    
+    const endTime = new Date();
+    const processingTime = (endTime - startTime) / 1000; // Thời gian xử lý (giây)
+    
+    if (isSuccess) {
+      // Cập nhật thông tin tài khoản với trạng thái thành công
+      const finalAccountInfo = {
+        ...accountData,
+        applicationStatus: "SUCCESS",
+        completionDate: endTime.toISOString(),
+        processingTime: processingTime
+      };
+      
+      // Lưu thông tin tài khoản cuối cùng với trạng thái thành công
+      const logFile = saveAccountInfo(finalAccountInfo);
+      
+      console.log(`Đã xử lý thành công email: ${email} (${processingTime.toFixed(2)} giây)`);
+      
+      return {
+        email: email,
+        firstName: accountData.firstName,
+        lastName: accountData.lastName,
+        password: accountData.password,
+        status: 'SUCCESS',
+        completionDate: endTime.toISOString(),
+        processingTime: processingTime,
+        logFile: logFile
+      };
+    } else {
+      throw new Error('Không thể xác nhận đơn đã được nộp thành công');
+    }
+  } catch (error) {
+    const endTime = new Date();
+    const processingTime = (endTime - startTime) / 1000; // Thời gian xử lý (giây)
+    
+    if (driver) {
+      await takeErrorScreenshot(driver, error);
+    }
+    console.error(`LỖI xử lý email ${email}:`, error.message);
+    
+    // Cập nhật thông tin tài khoản với trạng thái thất bại nếu có accountData
+    let logFile = null;
+    if (accountData) {
+      const failedAccountInfo = {
+        ...accountData,
+        applicationStatus: "FAILED",
+        failureReason: error.message,
+        failureDate: endTime.toISOString(),
+        processingTime: processingTime
+      };
+      
+      // Lưu thông tin tài khoản với trạng thái thất bại
+      logFile = saveAccountInfo(failedAccountInfo);
+    }
+    
+    return {
+      email: email,
+      firstName: accountData ? accountData.firstName : null,
+      lastName: accountData ? accountData.lastName : null,
+      password: accountData ? accountData.password : null,
+      status: 'FAILED',
+      error: error.message,
+      failureDate: endTime.toISOString(),
+      processingTime: processingTime,
+      logFile: logFile
+    };
+  } finally {
+    if (driver) {
+      try {
+        await driver.close();
+      } catch (e) {
+        console.error('Lỗi khi đóng session trình duyệt:', e.message);
+      }
+    }
+  }
+}
+
+// Hàm lưu kết quả tổng hợp
+function saveResults(results) {
+  const timestamp = new Date().toISOString().replace(/:/g, '-');
+  const fileName = path.join(CONFIG.LOG_DIR, `results_summary.json`);
+  
+  fs.writeFileSync(fileName, JSON.stringify(results, null, 2));
+  console.log(`Đã cập nhật kết quả tổng hợp vào file: ${fileName}`);
+  
+  // Tạo file CSV chứa thông tin cần thiết
+  const csvContent = [
+    'Email,First Name,Last Name,Password,Status,Completion Time,Processing Time (s),Log File',
+    ...results.map(r => 
+      `"${r.email}","${r.firstName || ''}","${r.lastName || ''}","${r.password || ''}","${r.status}","${r.completionDate || r.failureDate || ''}","${r.processingTime ? r.processingTime.toFixed(2) : ''}","${r.logFile || ''}"`)
+  ].join('\n');
+  
+  const csvFileName = path.join(CONFIG.LOG_DIR, `results_summary.csv`);
+  fs.writeFileSync(csvFileName, csvContent);
+  console.log(`Đã cập nhật kết quả CSV vào file: ${csvFileName}`);
+}
+
+// Thay đổi hàm main để sử dụng processAllEmails
+// Chạy chương trình
+processAllEmails()
+  .then(success => {
+    if (success) {
+      console.log('\nSCRIPT HOÀN THÀNH THÀNH CÔNG');
+    } else {
+      console.log('\nSCRIPT HOÀN THÀNH VỚI LỖI');
+    }
+    process.exit(0);
+  })
+  .catch(error => {
+    console.error('\nSCRIPT THẤT BẠI:', error);
+    process.exit(1);
+  });
 
 // Hàm khởi chạy Chrome với debugging enabled
 async function launchChromeWithDebugging() {
@@ -2287,134 +2521,207 @@ async function takeErrorScreenshot(driver, error) {
 // Cập nhật hàm chính để xử lý tất cả các trang
 async function runAutomation() {
   console.log('====== TỰ ĐỘNG TẠO TÀI KHOẢN ASU ======');
-  console.log('Chế độ: Tự động 100% (Tất cả các trang)');
-  
-  let driver = null;
-  let accountData = null;
-  let realAddress = null;
+  console.log('Chế độ: Xử lý tuần tự từng email (Riêng biệt hoàn toàn)');
   
   try {
-    // Tạo địa chỉ US thực tế
-    realAddress = generateRealUSAddress();
-    console.log(`Sử dụng địa chỉ thực tại US: ${realAddress.address}, ${realAddress.city}, ${realAddress.state} ${realAddress.zipCode}`);
+    // Đọc tất cả email từ file Excel
+    const emails = await readEmailsFromExcel();
+    console.log(`Tìm thấy ${emails.length} email để xử lý`);
     
-    // Đọc email từ file Excel
-    const email = await readEmailFromExcel();
-    console.log(`Sử dụng email: ${email}`);
+    // Mảng lưu kết quả xử lý của từng email
+    const results = [];
     
-    // Khởi chạy Chrome với debugging enabled
-    await launchChromeWithDebugging();
-    
-    // Đợi Chrome mở hoàn toàn
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    // Kết nối với Chrome đang chạy
-    driver = await connectToRunningChrome();
-    
-    // Mở trang ASU
-    console.log(`Mở trang tạo tài khoản ASU: ${CONFIG.ASU_URL}`);
-    await driver.get(CONFIG.ASU_URL);
-    
-    // Đợi CloudFlare và trang form
-    await waitForPageLoad(driver, 'start-my-application');
-    
-    // TRANG 1: Điền form tạo tài khoản và chuyển đến trang 2
-    console.log('\n===== TRANG 1: TẠO TÀI KHOẢN =====');
-    accountData = await fillCreateAccountForm(driver, email);
-    
-    // Đợi để page 2 load
-    await driver.sleep(3000);
-    
-    // TRANG 2: Điền form thông tin cá nhân
-    console.log('\n===== TRANG 2: THÔNG TIN CÁ NHÂN =====');
-    // Thêm thông tin địa chỉ thực
-    accountData = {
-      ...accountData,
-      address: realAddress.address,
-      city: realAddress.city,
-      state: realAddress.state,
-      zipCode: realAddress.zipCode
-    };
-    
-    accountData = await fillPersonalInfoForm(driver, accountData, email);
-    
-    // TRANG 3: Điền thông tin trường học
-    await handleEducationPage(driver, accountData);
-    
-    // TRANG 4: Xử lý trang Self-reported
-    await handleSelfReportedPage(driver);
-    
-    // TRANG 5: Xử lý trang Residency
-    await handleResidencyPage(driver, accountData);
-    
-    // TRANG 6: Xử lý trang chọn ngành học
-    await handleMajorSelectionPage(driver);
-    
-    // TRANG 7: Xử lý trang cuối cùng và submit application
-    const isSuccess = await handleFinalSubmitPage(driver);
-    
-    if (isSuccess) {
-      // Cập nhật thông tin tài khoản với trạng thái thành công
-      const finalAccountInfo = {
-        ...accountData,
-        applicationStatus: "SUCCESS",
-        completionDate: new Date().toISOString()
-      };
+    // Xử lý từng email một
+    for (let i = 0; i < emails.length; i++) {
+      const email = emails[i];
+      let driver = null;
+      let accountData = null;
+      let realAddress = null;
+      const startTime = new Date();
       
-      // Lưu thông tin tài khoản cuối cùng với trạng thái thành công
-      const logFile = saveAccountInfo(finalAccountInfo);
+      console.log(`\n===== XỬ LÝ EMAIL ${i+1}/${emails.length}: ${email} =====`);
       
-      console.log('\n===== HOÀN THÀNH =====');
-      console.log(`Đã tạo tài khoản và nộp đơn thành công với email: ${email}`);
-      console.log(`Thông tin tài khoản đã được lưu tại: ${logFile}`);
+      try {
+        // 1. Khởi chạy Chrome mới cho email này
+        await launchChromeWithDebugging();
+        console.log(`Đợi Chrome khởi động hoàn tất...`);
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        
+        // 2. Tạo địa chỉ US thực tế
+        realAddress = generateRealUSAddress();
+        console.log(`Sử dụng địa chỉ thực tại US: ${realAddress.address}, ${realAddress.city}, ${realAddress.state} ${realAddress.zipCode}`);
+        
+        // 3. Kết nối với Chrome đang chạy
+        driver = await connectToRunningChrome();
+        
+        // 4. Mở trang ASU
+        console.log(`Mở trang tạo tài khoản ASU: ${CONFIG.ASU_URL}`);
+        await driver.get(CONFIG.ASU_URL);
+        
+        // 5. Đợi CloudFlare và trang form
+        await waitForPageLoad(driver, 'start-my-application');
+        
+        // 6. TRANG 1: Điền form tạo tài khoản và chuyển đến trang 2
+        console.log('\n===== TRANG 1: TẠO TÀI KHOẢN =====');
+        accountData = await fillCreateAccountForm(driver, email);
+        
+        // 7. Đợi để page 2 load
+        await driver.sleep(3000);
+        
+        // 8. TRANG 2: Điền form thông tin cá nhân
+        console.log('\n===== TRANG 2: THÔNG TIN CÁ NHÂN =====');
+        // Thêm thông tin địa chỉ thực
+        accountData = {
+          ...accountData,
+          address: realAddress.address,
+          city: realAddress.city,
+          state: realAddress.state,
+          zipCode: realAddress.zipCode
+        };
+        
+        accountData = await fillPersonalInfoForm(driver, accountData, email);
+        
+        // 9. TRANG 3: Điền thông tin trường học
+        await handleEducationPage(driver, accountData);
+        
+        // 10. TRANG 4: Xử lý trang Self-reported
+        await handleSelfReportedPage(driver);
+        
+        // 11. TRANG 5: Xử lý trang Residency
+        await handleResidencyPage(driver, accountData);
+        
+        // 12. TRANG 6: Xử lý trang chọn ngành học
+        await handleMajorSelectionPage(driver);
+        
+        // 13. TRANG 7: Xử lý trang cuối cùng và submit application
+        const isSuccess = await handleFinalSubmitPage(driver);
+        
+        const endTime = new Date();
+        const processingTime = (endTime - startTime) / 1000; // Thời gian xử lý (giây)
+        
+        if (isSuccess) {
+          // Cập nhật thông tin tài khoản với trạng thái thành công
+          const finalAccountInfo = {
+            ...accountData,
+            applicationStatus: "SUCCESS",
+            completionDate: endTime.toISOString(),
+            processingTime: processingTime
+          };
+          
+          // Lưu thông tin tài khoản cuối cùng với trạng thái thành công
+          const logFile = saveAccountInfo(finalAccountInfo);
+          
+          console.log(`Đã xử lý thành công email: ${email} (${processingTime.toFixed(2)} giây)`);
+          
+          results.push({
+            email: email,
+            firstName: accountData.firstName,
+            lastName: accountData.lastName,
+            password: accountData.password,
+            status: 'SUCCESS',
+            completionDate: endTime.toISOString(),
+            processingTime: processingTime,
+            logFile: logFile
+          });
+        } else {
+          throw new Error('Không thể xác nhận đơn đã được nộp thành công');
+        }
+      } catch (error) {
+        const endTime = new Date();
+        const processingTime = (endTime - startTime) / 1000; // Thời gian xử lý (giây)
+        
+        if (driver) {
+          await takeErrorScreenshot(driver, error);
+        }
+        console.error(`LỖI xử lý email ${email}:`, error.message);
+        
+        // Cập nhật thông tin tài khoản với trạng thái thất bại nếu có accountData
+        let logFile = null;
+        if (accountData) {
+          const failedAccountInfo = {
+            ...accountData,
+            applicationStatus: "FAILED",
+            failureReason: error.message,
+            failureDate: endTime.toISOString(),
+            processingTime: processingTime
+          };
+          
+          // Lưu thông tin tài khoản với trạng thái thất bại
+          logFile = saveAccountInfo(failedAccountInfo);
+        }
+        
+        results.push({
+          email: email,
+          firstName: accountData ? accountData.firstName : null,
+          lastName: accountData ? accountData.lastName : null,
+          password: accountData ? accountData.password : null,
+          status: 'FAILED',
+          error: error.message,
+          failureDate: endTime.toISOString(),
+          processingTime: processingTime,
+          logFile: logFile
+        });
+      } finally {
+        // Đóng trình duyệt Chrome hoàn toàn
+        try {
+          console.log('Đóng trình duyệt Chrome sau khi xử lý email...');
+          
+          // Đóng driver trước
+          if (driver) {
+            try {
+              await driver.quit();
+            } catch (e) {
+              console.error('Lỗi khi đóng driver:', e.message);
+            }
+          }
+          
+          // Đóng tất cả các process Chrome
+          const processes = exec('taskkill /F /IM chrome.exe', { windowsHide: true });
+          
+          // Đợi để đảm bảo Chrome đã đóng hoàn toàn
+          await new Promise(resolve => setTimeout(resolve, 3000));
+          
+          console.log('Đã đóng Chrome thành công.');
+        } catch (e) {
+          console.error('Lỗi khi đóng Chrome:', e.message);
+        }
+      }
+      
+      // Lưu kết quả tổng hợp sau mỗi email
+      saveResults(results);
+      
+      // Đợi một chút trước khi xử lý email tiếp theo
+      if (i < emails.length - 1) {
+        console.log(`\nĐợi 10 giây trước khi xử lý email tiếp theo...`);
+        await new Promise(resolve => setTimeout(resolve, 10000));
+      }
     }
+    
+    console.log('\n===== KẾT QUẢ TỔNG HỢP =====');
+    console.log(`Tổng số email đã xử lý: ${results.length}`);
+    const successful = results.filter(r => r.status === 'SUCCESS').length;
+    console.log(`Thành công: ${successful}/${results.length}`);
+    console.log(`Thất bại: ${results.length - successful}/${results.length}`);
     
     return true;
   } catch (error) {
-    await takeErrorScreenshot(driver, error);
     console.error('LỖI CHẠY SCRIPT:', error.message);
-    
-    // Cập nhật thông tin tài khoản với trạng thái thất bại nếu có accountData
-    if (accountData) {
-      const failedAccountInfo = {
-        ...accountData,
-        applicationStatus: "FAILED",
-        failureReason: error.message,
-        failureDate: new Date().toISOString()
-      };
-      
-      // Lưu thông tin tài khoản với trạng thái thất bại
-      saveAccountInfo(failedAccountInfo);
-    }
-    
     return false;
-  } finally {
-    // Đợi một chút trước khi đóng trình duyệt
-    await new Promise(resolve => setTimeout(resolve, 5000));
-    
-    if (driver) {
-      try {
-        console.log('Đóng trình duyệt Chrome...');
-        await driver.quit();
-        console.log('Đã đóng Chrome thành công.');
-      } catch (e) {
-        console.error('Lỗi khi đóng Chrome:', e.message);
-      }
-    }
   }
 }
   
   // Chạy chương trình
-  runAutomation()
-    .then(success => {
-      if (success) {
-        console.log('\nSCRIPT HOÀN THÀNH THÀNH CÔNG');
-      } else {
-        console.log('\nSCRIPT HOÀN THÀNH VỚI LỖI');
-      }
-      process.exit(0);
-    })
-    .catch(error => {
-      console.error('\nSCRIPT THẤT BẠI:', error);
-      process.exit(1);
-    });
+ // Chạy chương trình
+runAutomation()
+.then(success => {
+  if (success) {
+    console.log('\nSCRIPT HOÀN THÀNH THÀNH CÔNG');
+  } else {
+    console.log('\nSCRIPT HOÀN THÀNH VỚI LỖI');
+  }
+  process.exit(0);
+})
+.catch(error => {
+  console.error('\nSCRIPT THẤT BẠI:', error);
+  process.exit(1);
+});
