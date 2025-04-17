@@ -40,17 +40,43 @@ app.get('/api/results', (req, res) => {
 app.get('/api/account/:logFile', (req, res) => {
   try {
     const logFile = req.params.logFile;
-    const logPath = path.join(CONFIG.LOG_DIR, path.basename(logFile));
+    
+    // Sửa đổi 1: Kiểm tra xem logFile có phải là đường dẫn đầy đủ
+    let logPath;
+    if (logFile.includes(path.sep)) {
+      // Nếu logFile chứa dấu phân cách đường dẫn, sử dụng nó trực tiếp
+      logPath = logFile;
+    } else {
+      // Nếu không, lấy tên file từ logFile và tìm trong thư mục LOG_DIR
+      logPath = path.join(CONFIG.LOG_DIR, path.basename(logFile));
+    }
+    
+    console.log('Truy cập file log:', logPath);
     
     if (fs.existsSync(logPath)) {
       const accountInfo = JSON.parse(fs.readFileSync(logPath, 'utf8'));
       res.json(accountInfo);
     } else {
-      res.status(404).json({ error: 'Account log not found' });
+      // Sửa đổi 2: Tìm kiếm file log dựa trên tên file một cách mở rộng hơn
+      const files = fs.readdirSync(CONFIG.LOG_DIR);
+      const matchingFile = files.find(file => 
+        file.includes(path.basename(logFile)) || 
+        file.toLowerCase().includes(path.basename(logFile).toLowerCase())
+      );
+      
+      if (matchingFile) {
+        const alternativePath = path.join(CONFIG.LOG_DIR, matchingFile);
+        console.log('Tìm thấy file thay thế:', alternativePath);
+        const accountInfo = JSON.parse(fs.readFileSync(alternativePath, 'utf8'));
+        res.json(accountInfo);
+      } else {
+        console.error('Không tìm thấy file log:', logPath);
+        res.status(404).json({ error: 'Account log not found', requestedPath: logPath });
+      }
     }
   } catch (error) {
-    console.error('Error reading account details:', error);
-    res.status(500).json({ error: 'Failed to read account details' });
+    console.error('Error reading account details:', error.message);
+    res.status(500).json({ error: 'Failed to read account details: ' + error.message });
   }
 });
 

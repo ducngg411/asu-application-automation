@@ -16,10 +16,10 @@ const CONFIG = {
   PAGE_LOAD_TIMEOUT: 60000,   // 60 giây cho trang tải
   FORM_TIMEOUT: 30000,        // 30 giây cho form xuất hiện
   HUMAN_DELAY: {             // Độ trễ giống người thật
-    MIN_TYPE: 50,            // Thời gian tối thiểu giữa các ký tự (ms)
-    MAX_TYPE: 150,           // Thời gian tối đa giữa các ký tự (ms)
-    MIN_ACTION: 500,         // Thời gian tối thiểu giữa các hành động (ms)
-    MAX_ACTION: 2000,        // Thời gian tối đa giữa các hành động (ms)
+    MIN_TYPE: 20,            // Thời gian tối thiểu giữa các ký tự (ms)
+    MAX_TYPE: 100,           // Thời gian tối đa giữa các ký tự (ms)
+    MIN_ACTION: 300,         // Thời gian tối thiểu giữa các hành động (ms)
+    MAX_ACTION: 1500,        // Thời gian tối đa giữa các hành động (ms)
   }
 };
 
@@ -301,20 +301,8 @@ async function processEmail(email, index) {
     }
     console.error(`LỖI xử lý email ${email}:`, error.message);
     
-    // Cập nhật thông tin tài khoản với trạng thái thất bại nếu có accountData
-    let logFile = null;
-    if (accountData) {
-      const failedAccountInfo = {
-        ...accountData,
-        applicationStatus: "FAILED",
-        failureReason: error.message,
-        failureDate: endTime.toISOString(),
-        processingTime: processingTime
-      };
-      
-      // Lưu thông tin tài khoản với trạng thái thất bại
-      logFile = saveAccountInfo(failedAccountInfo);
-    }
+    // THAY ĐỔI: Không lưu log cho tài khoản thất bại
+    console.log(`Bỏ qua lưu thông tin cho email thất bại: ${email}`);
     
     return {
       email: email,
@@ -325,7 +313,7 @@ async function processEmail(email, index) {
       error: error.message,
       failureDate: endTime.toISOString(),
       processingTime: processingTime,
-      logFile: logFile
+      logFile: null // Không có file log cho tài khoản thất bại
     };
   } finally {
     if (driver) {
@@ -1749,10 +1737,36 @@ function verifyPasswordRequirements(password) {
 }
   
   // Hàm lưu thông tin tài khoản
-  function saveAccountInfo(accountInfo) {
-    const timestamp = new Date().toISOString().replace(/:/g, '-');
-    const fileName = path.join(CONFIG.LOG_DIR, `account_${timestamp}.json`);
+// Hàm lưu thông tin tài khoản với đường dẫn đầy đủ
+function saveAccountInfo(accountInfo) {
+  // Kiểm tra nếu không phải là SUCCESS và không phải lần đầu tạo tài khoản thì không lưu
+  if (accountInfo.applicationStatus === 'FAILED' && !accountInfo.isInitialSave) {
+    console.log('Bỏ qua lưu thông tin tài khoản thất bại');
+    return accountInfo.logFile || null; // Trả về đường dẫn đã lưu trước đó nếu có
+  }
+
+  // Đánh dấu đã lưu ít nhất một lần
+  accountInfo.isInitialSave = true;
+  
+  const timestamp = new Date().toISOString().replace(/:/g, '-');
+  let fileName;
+  
+  // Nếu là SUCCESS, đặt tên file theo email để dễ nhận biết
+  if (accountInfo.applicationStatus === 'SUCCESS') {
+    const safeEmail = accountInfo.email.replace(/[@.]/g, '_');
+    fileName = path.join(CONFIG.LOG_DIR, `success_${safeEmail}.json`);
+  } else {
+    // Nếu chưa hoàn thành (đang xử lý), sử dụng timestamp
+    fileName = path.join(CONFIG.LOG_DIR, `account_${timestamp}.json`);
+  }
+  
+  try {
+    // Đảm bảo thư mục logs tồn tại
+    if (!fs.existsSync(CONFIG.LOG_DIR)) {
+      fs.mkdirSync(CONFIG.LOG_DIR, { recursive: true });
+    }
     
+    // Lưu file
     fs.writeFileSync(fileName, JSON.stringify(accountInfo, null, 2));
     console.log(`Đã lưu thông tin tài khoản vào file: ${fileName}`);
     
@@ -1782,8 +1796,51 @@ function verifyPasswordRequirements(password) {
     
     console.log("================================\n");
     
+    // Trả về đường dẫn đầy đủ của file
     return fileName;
+  } catch (error) {
+    console.error('Lỗi khi lưu thông tin tài khoản:', error.message);
+    return null;
   }
+}
+
+// Hàm lưu kết quả tổng hợp với đường dẫn đầy đủ
+function saveResults(results) {
+  try {
+    // Đảm bảo thư mục logs tồn tại
+    if (!fs.existsSync(CONFIG.LOG_DIR)) {
+      fs.mkdirSync(CONFIG.LOG_DIR, { recursive: true });
+    }
+    
+    const timestamp = new Date().toISOString().replace(/:/g, '-');
+    const fileName = path.join(CONFIG.LOG_DIR, `results_summary.json`);
+    
+    // Chỉnh sửa: Đảm bảo đường dẫn file log là đường dẫn đầy đủ
+    const updatedResults = results.map(result => {
+      if (result.logFile && !result.logFile.includes(path.sep)) {
+        // Nếu logFile không phải là đường dẫn đầy đủ, thì thêm đường dẫn thư mục
+        result.logFile = path.join(CONFIG.LOG_DIR, path.basename(result.logFile));
+      }
+      return result;
+    });
+    
+    fs.writeFileSync(fileName, JSON.stringify(updatedResults, null, 2));
+    console.log(`Đã cập nhật kết quả tổng hợp vào file: ${fileName}`);
+    
+    // Tạo file CSV chứa thông tin cần thiết
+    const csvContent = [
+      'Email,First Name,Last Name,Password,Status,Completion Time,Processing Time (s),Log File',
+      ...updatedResults.map(r => 
+        `"${r.email}","${r.firstName || ''}","${r.lastName || ''}","${r.password || ''}","${r.status}","${r.completionDate || r.failureDate || ''}","${r.processingTime ? r.processingTime.toFixed(2) : ''}","${r.logFile || ''}"`)
+    ].join('\n');
+    
+    const csvFileName = path.join(CONFIG.LOG_DIR, `results_summary.csv`);
+    fs.writeFileSync(csvFileName, csvContent);
+    console.log(`Đã cập nhật kết quả CSV vào file: ${csvFileName}`);
+  } catch (error) {
+    console.error('Lỗi khi lưu kết quả tổng hợp:', error.message);
+  }
+}
 
 // Hàm đợi Cloudflare và trang form hiển thị
 async function waitForPageLoad(driver, elementId) {

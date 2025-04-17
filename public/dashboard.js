@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     const searchButton = document.getElementById('searchButton');
     const copyDetailsBtn = document.getElementById('copyDetailsBtn');
+    const statusBar = document.getElementById('statusBar');
     
     // Bootstrap modal
     const screenModal = new bootstrap.Modal(document.getElementById('screenModal'));
@@ -226,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
       selectedAccount = account;
       copyDetailsBtn.disabled = false;
       
-      if (!account || !account.logFile) {
+      if (!account) {
         accountDetails.innerHTML = '<p class="text-center text-muted">Không có thông tin chi tiết</p>';
         return;
       }
@@ -234,15 +235,32 @@ document.addEventListener('DOMContentLoaded', function() {
       // Show loading state
       accountDetails.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><p>Đang tải thông tin chi tiết...</p></div>';
       
+      // Debug: Log which file we're trying to fetch
+      console.log("Đang tải thông tin chi tiết từ: ", account.logFile);
+      
       // Fetch account details
       fetch(`/api/account/${account.logFile}`)
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) {
+            // Try to get error details if the response is not OK
+            return response.json().then(errData => {
+              throw new Error(`${response.status} ${response.statusText}: ${errData.error || 'Unknown error'}`);
+            });
+          }
+          return response.json();
+        })
         .then(data => {
           renderAccountDetails(data);
         })
         .catch(error => {
           console.error('Error fetching account details:', error);
-          accountDetails.innerHTML = '<div class="alert alert-danger">Lỗi khi tải thông tin chi tiết</div>';
+          accountDetails.innerHTML = `
+            <div class="alert alert-danger">
+              <h5>Lỗi khi tải thông tin chi tiết</h5>
+              <p>${error.message}</p>
+              <small>Hãy kiểm tra file log: ${account.logFile}</small>
+            </div>
+          `;
         });
     }
     
@@ -367,7 +385,12 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       fetch(`/api/account/${selectedAccount.logFile}`)
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`${response.status} ${response.statusText}`);
+          }
+          return response.json();
+        })
         .then(data => {
           let text = `Email: ${data.email || 'N/A'}\n`;
           text += `Họ tên: ${data.firstName || 'N/A'} ${data.lastName || ''} ${data.suffix || ''}\n`;
@@ -395,7 +418,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
           console.error('Error copying account details:', error);
-          updateStatus('Lỗi khi sao chép thông tin chi tiết', 'danger');
+          updateStatus('Lỗi khi sao chép thông tin chi tiết: ' + error.message, 'danger');
         });
     }
     
